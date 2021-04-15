@@ -14,10 +14,22 @@ assert combinations([1, 2], [3, 4]) == [
     [2, 4],
 ]
 """
-import itertools
 from typing import Any, List
 
 
 def combinations(*args: List[Any]) -> List[List]:
-    res = itertools.product(*args)
-    return [list(obj) for obj in res]
+    res, nums = [], []
+    if args:
+        recursion(res, nums, args)
+    return res
+
+
+def recursion(res, nums, args, index=0):
+    for num in args[index]:
+        nums.append(num)
+        if len(args) == index + 1:
+            res.append(nums.copy())
+        else:
+            recursion(res, nums, args, index=index + 1)
+        nums.pop()
+    return res
