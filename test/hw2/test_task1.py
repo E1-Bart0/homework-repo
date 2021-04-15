@@ -26,7 +26,7 @@ Large Words = typesetting 16
 """
 
 
-class TestHW1(unittest.TestCase):
+class TestTask1(unittest.TestCase):
     def setUp(self) -> None:
         self.file_path = "Test_hw1.txt"
         with open(self.file_path, mode="w", encoding="raw_unicode_escape") as file:
@@ -39,24 +39,24 @@ class TestHW1(unittest.TestCase):
             "industryDrvgtr",
         ]
         checking = get_longest_diverse_words(self.file_path)
-        self.assertEqual(10, len(checking))
-        self.assertEqual(result_start_with, checking[: len(result_start_with)])
+        assert 10 == len(checking)
+        assert result_start_with == checking[: len(result_start_with)]
 
     def test_get_rarest_char(self):
         rarest_char = "z"
-        self.assertEqual(rarest_char, get_rarest_char(self.file_path))
+        assert rarest_char == get_rarest_char(self.file_path)
 
     def test_count_punctuation_chars(self):
         result = 16
-        self.assertEqual(result, count_punctuation_chars(self.file_path))
+        assert result == count_punctuation_chars(self.file_path)
 
     def test_count_non_ascii_chars(self):
         result = 5
-        self.assertEqual(result, count_non_ascii_chars(self.file_path))
+        assert result == count_non_ascii_chars(self.file_path)
 
     def test_get_most_common_non_ascii_char(self):
         result = "ä"
-        self.assertEqual(result, get_most_common_non_ascii_char(self.file_path))
+        assert result == get_most_common_non_ascii_char(self.file_path)
 
     def tearDown(self) -> None:
         os.remove(self.file_path)
