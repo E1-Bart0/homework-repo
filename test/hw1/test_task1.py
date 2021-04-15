@@ -161,4 +161,5 @@ def test_check_invalid_data_not_from_begin():
         218922995834555169026,
         1,
     )
+
     assert not check_fibonacci(data)
