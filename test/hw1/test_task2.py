@@ -32,6 +32,7 @@ class Task3Test(unittest.TestCase):
 
     def test_find_maximum_and_minimum(self):
         result = find_maximum_and_minimum(self.file_name)
+
         assert (self.min_value, self.max_value) == result
 
     def tearDown(self):
