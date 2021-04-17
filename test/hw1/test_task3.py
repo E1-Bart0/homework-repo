@@ -9,8 +9,7 @@ def test_check_sum_of_four():
 
 
 def test_check_sum_of_four_with_zeros():
-    length_list = 10
-    data = [[0] * length_list for _ in range(4)]
+    data = [[0, 0], [0, 0], [0, 0], [0, 0]]
 
     result = check_sum_of_four(*data)
-    assert length_list ** 4 == result
+    assert 2 ** 4 == result
