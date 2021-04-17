@@ -7,27 +7,27 @@ class Filter:
     functions that return True if object in list conforms to some criteria
     """
 
-    def __init__(self, functions):
+    def __init__(self, *functions):
         self.functions = functions
 
     def apply(self, data):
-        return [item for item in data if all(i(item) for i in self.functions)]
+        return [item for item in data if all(i(item) for i in self.functions[0])]
 
 
 # example of usage:
-# positive_even = Filter(lamba a: a % 1 == 0, lambda a: a > 0, lambda a: isinstance(int, a)))
+# positive_even = Filter(lambda a: a % 1 == 0, lambda a: a > 0, lambda a: isinstance(int, a)))
 # positive_even.apply(range(99)) should return only even numbers from 0 to 99
 
 
-def make_filter(**keywords):
+def make_filter(**kwargs):
     """
     Generate filter object for specified keywords
     """
     filter_funcs = []
-    for key, value in keywords.items():
+    for key, value in kwargs.items():
 
-        def keyword_filter_func(value):
-            return value[key] == value
+        def keyword_filter_func(checking_dict):
+            return checking_dict[key] == value if key in checking_dict else False
 
         filter_funcs.append(keyword_filter_func)
     return Filter(filter_funcs)
