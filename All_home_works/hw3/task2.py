@@ -25,8 +25,8 @@ from multiprocessing import Pool
 
 
 def slow_calculate(value):
-    time.sleep(random.randint(1, 3))
-    data = hashlib.md5(str(value).encode()).digest()
+    time.sleep(random.randint(1, 3))  # noqa: S311
+    data = hashlib.md5(str(value).encode()).digest()  # noqa: S303
     return sum(struct.unpack("<" + "B" * len(data), data))
 
 
