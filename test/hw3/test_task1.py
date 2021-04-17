@@ -4,13 +4,16 @@ N = 4
 
 
 @cache(times=N)
-def f():
-    return input("? ")
+def f(attr=None):
+    return attr
 
 
 def test__cache():
-    for _ in range(N):
-        f()
+    input_data = 1
+    assert 1 == f(input_data)
+    for _ in range(N - 1):
+        assert 1 == f()
+    assert not f()
 
 
 if __name__ == "__main__":
