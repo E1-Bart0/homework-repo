@@ -22,9 +22,6 @@ def get_fib_first_element(data, fib_sequence):
 
 
 def check_fibonacci(data: Sequence[int]) -> bool:
-    if not len(data):
-        return False
-
     fib_sequence = generate_fib_sequence()
     fib_num = get_fib_first_element(data, fib_sequence)
 

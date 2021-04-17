@@ -20,11 +20,6 @@ def test_check_valid_data__not_from_begin():
     assert check_fibonacci(data)
 
 
-def test_check_no_data():
-    data = ()
-    assert not check_fibonacci(data)
-
-
 def test_check_invalid_data_first():
     data = (
         5,
