@@ -30,17 +30,6 @@ def slow_calculate(value):
     return sum(struct.unpack("<" + "B" * len(data), data))
 
 
-def timer(func):
-    def wrapper(*args, **kwargs):
-        start = time.time()
-        result = func(*args, **kwargs)
-        delta = time.time() - start
-        return result, delta
-
-    return wrapper
-
-
-@timer
 def sum_of_slow_calculate(max_value=500):
     pool = Pool(processes=max_value)
     array = pool.map(slow_calculate, range(max_value))
