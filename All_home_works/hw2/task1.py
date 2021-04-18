@@ -10,13 +10,13 @@ import string
 from collections import Counter, deque
 from typing import List
 
-TRANSLATE = str.maketrans({char: "" for char in string.punctuation})
+CROP_PUNCTUATION = str.maketrans({char: "" for char in string.punctuation})
 
 
 def _get_lines(file_path: str) -> str:
     with open(file_path, encoding="raw_unicode_escape") as reading_file:
-        for line in reading_file.readlines():
-            line = line[:-1]
+        for line in reading_file:
+            line = line.rstrip("\n")
             if line:
                 yield line
 
@@ -24,7 +24,7 @@ def _get_lines(file_path: str) -> str:
 def get_longest_diverse_words(file_path: str) -> List[str]:
     queue = deque()
     for line in _get_lines(file_path):
-        line = line.translate(TRANSLATE)
+        line = line.translate(CROP_PUNCTUATION)
         words = [(word, len(set(word))) for word in line.split() if word]
         queue = _check_words(queue, words)
 

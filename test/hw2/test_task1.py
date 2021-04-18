@@ -1,4 +1,4 @@
-import os
+import tempfile
 import unittest
 
 from All_home_works.hw2.task1 import (
@@ -28,9 +28,9 @@ Large Words = typesetting 16
 
 class TestTask1(unittest.TestCase):
     def setUp(self) -> None:
-        self.file_path = "Test_hw1.txt"
-        with open(self.file_path, mode="w", encoding="raw_unicode_escape") as file:
-            file.write(TEXT)
+        self.file = tempfile.NamedTemporaryFile(mode="w", encoding="raw_unicode_escape")
+        self.file.write(TEXT)
+        self.file.seek(0)
 
     def test_get_longest_diverse_words(self):
         result_start_with = [
@@ -38,25 +38,25 @@ class TestTask1(unittest.TestCase):
             "typesettingLalaBlabla",
             "industryDrvgtr",
         ]
-        checking = get_longest_diverse_words(self.file_path)
+        checking = get_longest_diverse_words(self.file.name)
         assert 10 == len(checking)
         assert result_start_with == checking[: len(result_start_with)]
 
     def test_get_rarest_char(self):
         rarest_char = "z"
-        assert rarest_char == get_rarest_char(self.file_path)
+        assert rarest_char == get_rarest_char(self.file.name)
 
     def test_count_punctuation_chars(self):
         result = 16
-        assert result == count_punctuation_chars(self.file_path)
+        assert result == count_punctuation_chars(self.file.name)
 
     def test_count_non_ascii_chars(self):
         result = 5
-        assert result == count_non_ascii_chars(self.file_path)
+        assert result == count_non_ascii_chars(self.file.name)
 
     def test_get_most_common_non_ascii_char(self):
         result = "ä"
-        assert result == get_most_common_non_ascii_char(self.file_path)
+        assert result == get_most_common_non_ascii_char(self.file.name)
 
     def tearDown(self) -> None:
-        os.remove(self.file_path)
+        self.file.close()
