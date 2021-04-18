@@ -12,3 +12,7 @@ def test_cache():
 
 def func(a, b):
     return (a ** b) ** 2
+
+
+if __name__ == "__main__":
+    test_cache()
