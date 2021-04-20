@@ -53,5 +53,9 @@ def test_check_invalid_data_middle():
 
 def test_check_invalid_data_not_from_begin():
     data = (13, 22, 34)
+    assert not check_fibonacci(data)
 
+
+def test_check_no_data():
+    data = ()
     assert not check_fibonacci(data)
