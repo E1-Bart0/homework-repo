@@ -18,18 +18,18 @@ from typing import Any, List
 
 
 def combinations(*args: List[Any]) -> List[List]:
-    res, nums = [], []
+    accumulator = []
     if args:
-        recursion(res, nums, args)
-    return res
+        recursion(accumulator, args)
+    return accumulator
 
 
-def recursion(res, nums, args, index=0):
+def recursion(accumulator, args, index=0, nums=None):  # noqa: CCR001
+    nums = nums or []
     for num in args[index]:
         nums.append(num)
         if len(args) == index + 1:
-            res.append(nums.copy())
+            accumulator.append(nums.copy())
         else:
-            recursion(res, nums, args, index=index + 1)
+            recursion(accumulator, args, index=index + 1, nums=nums)
         nums.pop()
-    return res
