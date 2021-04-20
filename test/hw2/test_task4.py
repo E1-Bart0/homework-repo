@@ -7,12 +7,8 @@ def test_cache():
     cache_fun = cache(func)
     val1 = cache_fun(*some)
     val2 = cache_fun(*some)
-    assert val1 == val2
+    assert val1 is val2
 
 
 def func(a, b):
     return (a ** b) ** 2
-
-
-if __name__ == "__main__":
-    test_cache()

@@ -25,13 +25,12 @@ def cache(func: Callable) -> Callable:
     memo = {}
 
     def wrapper(*args, **kwargs):
-        call = str(args) + str(kwargs)
+        call = f"{args}{kwargs}"
         if call in memo:
             print("Called from Cache")  # noqa: T001
-            return memo[call]
         else:
             print("Evaluate function")  # noqa: T001
             memo[call] = func(*args, **kwargs)
-            return memo[call]
+        return memo[call]
 
     return wrapper
