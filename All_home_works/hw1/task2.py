@@ -15,7 +15,7 @@ def find_maximum_and_minimum(file_name: str) -> Tuple[int, int]:
     with open(file_name) as data_file:
         max_value, min_value = get_first_value_in(data_file)
         for line in data_file:
-            line = line[:-1]
+            line = line.rstrip("\n")
             if line:
                 num = int(line)
                 max_value, min_value = check_max_min_value(max_value, min_value, num)
