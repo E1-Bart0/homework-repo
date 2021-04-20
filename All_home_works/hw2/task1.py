@@ -7,10 +7,26 @@ Given a file containing text. Complete using only default collections:
     5) Find most common non ascii char for document
 """
 import string
-from collections import Counter, deque
 from typing import List
 
 CROP_PUNCTUATION = str.maketrans({char: "" for char in string.punctuation})
+
+
+class Counter:
+    def __init__(self):
+        self.counter = {}
+
+    def count(self, key):
+        if key in self.counter:
+            self.counter[key] += 1
+        else:
+            self.counter[key] = 0
+
+    def most_common(self):
+        sorted_counter = sorted(
+            self.counter.items(), key=lambda item: item[1], reverse=True
+        )
+        return list(sorted_counter)
 
 
 def _get_lines(file_path: str) -> str:
@@ -22,7 +38,7 @@ def _get_lines(file_path: str) -> str:
 
 
 def get_longest_diverse_words(file_path: str) -> List[str]:
-    queue = deque()
+    queue = []
     for line in _get_lines(file_path):
         line = line.translate(CROP_PUNCTUATION)
         words = [(word, len(set(word))) for word in line.split() if word]
@@ -54,7 +70,7 @@ def get_rarest_char(file_path: str) -> str:
 def _check_char_in(line, counter):
     for char in line:
         if char not in string.punctuation and ord(char) < 126:
-            counter[char] += 1
+            counter.count(char)
 
 
 def count_punctuation_chars(file_path: str) -> int:
@@ -84,7 +100,7 @@ def _check_non_ascii(char, counter):
         if isinstance(counter, int):
             counter += 1
         else:
-            counter[char] += 1
+            counter.count(char)
     return counter
 
 
