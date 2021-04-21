@@ -11,7 +11,7 @@ class Filter:
         self.functions = functions
 
     def apply(self, data):
-        return [item for item in data if all(i(item) for i in self.functions[0])]
+        return [item for item in data if all(i(item) for i in self.functions)]
 
 
 # example of usage:
@@ -30,7 +30,7 @@ def make_filter(**kwargs):
             return checking_dict[key] == value if key in checking_dict else False
 
         filter_funcs.append(keyword_filter_func)
-    return Filter(filter_funcs)
+    return Filter(*filter_funcs)
 
 
 sample_data = [
