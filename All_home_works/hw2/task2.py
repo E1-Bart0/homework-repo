@@ -26,6 +26,6 @@ def major_and_minor_elem(inp: List) -> Tuple[int, int]:
     for num in inp:
         count[num] += 1
     counter = count.most_common()
-    max_common = counter[0][0] if counter[0][1] > len(inp) // 2 else None
-    min_common = counter[-1][0] if counter[-2][1] != counter[-1][1] else None
+    max_common = counter[0][0]
+    min_common = counter[-1][0]
     return max_common, min_common
