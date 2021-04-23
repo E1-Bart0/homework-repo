@@ -10,21 +10,19 @@ from typing import List
 
 
 def find_maximal_subarray_sum(nums: List[int], k: int) -> int:
-    counter = 0
-    max_sum = 0
-
-    for index, current_num in enumerate(nums):
-        if index < k:
-            counter += current_num
-            max_sum += current_num
-        else:
-            num_k_indexes_ago = nums[index - k]
-            counter += current_num - num_k_indexes_ago
-            max_sum = _get_max_sum(counter, max_sum)
+    max_sum = nums[0]
+    for index in range(len(nums)):
+        max_sum = _get_max_sum(max_sum, index - k, index, nums)
     return max_sum
 
 
-def _get_max_sum(counter, max_sum):
-    if counter > max_sum:
-        max_sum = counter
-    return max_sum  # noqa: R504
+def _get_max_sum(max_sum, index_start, index_finish, array):
+    index_start = max(0, index_start + 1)
+    reversed_sub_array = reversed(array[index_start : index_finish + 1])
+    current_sum = 0
+    for num in reversed_sub_array:
+        current_sum += num
+        if current_sum > max_sum:
+            max_sum = current_sum
+
+    return max_sum
