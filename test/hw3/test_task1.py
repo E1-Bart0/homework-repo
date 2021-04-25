@@ -15,4 +15,4 @@ def test__cache():
     assert solution is f()
     assert solution is f()
     assert solution is f()
-    assert solution is not f(input_data)
+    assert solution is not f()
