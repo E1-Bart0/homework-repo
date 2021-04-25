@@ -87,26 +87,19 @@ def _check_punctuation(char, counter):
     return counter
 
 
-def count_non_ascii_chars(file_path: str) -> int:
+def count_non_ascii_chars(file_path: str) -> int:  # noqa: CCR001
     counter = 0
     for line in _get_lines(file_path):
         for char in line:
-            counter = _check_non_ascii(char, counter)
+            if ord(char) > 126:
+                counter += 1
     return counter
 
 
-def _check_non_ascii(char, counter):
-    if ord(char) > 126:
-        if isinstance(counter, int):
-            counter += 1
-        else:
-            counter.count(char)
-    return counter
-
-
-def get_most_common_non_ascii_char(file_path: str) -> str:
+def get_most_common_non_ascii_char(file_path: str) -> str:  # noqa: CCR001
     counter = Counter()
     for line in _get_lines(file_path):
         for char in line:
-            _check_non_ascii(char, counter)
+            if ord(char) > 126:
+                counter.count(char)
     return counter.most_common()[0][0]
