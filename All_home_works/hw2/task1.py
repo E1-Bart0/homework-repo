@@ -9,20 +9,22 @@ Given a file containing text. Complete using only default collections:
 import string
 from typing import List
 
-CROP_PUNCTUATION = str.maketrans({char: "" for char in string.punctuation})
+PUNCTUATION = {char: "" for char in string.punctuation}
+CROP_PUNCTUATION = str.maketrans(PUNCTUATION)
 
 
 class Counter:
     def __init__(self):
         self.counter = {}
 
-    def count(self, key):
+    def add(self, key):
         if key in self.counter:
             self.counter[key] += 1
         else:
             self.counter[key] = 0
 
-    def most_common(self):
+    @property
+    def sort_counter(self):
         sorted_counter = sorted(
             self.counter.items(), key=lambda item: item[1], reverse=True
         )
@@ -44,7 +46,7 @@ def get_longest_diverse_words(file_path: str) -> List[str]:
         words = [(word, len(set(word))) for word in line.split() if word]
         queue = _check_words(queue, words)
 
-    return [word[0] for word in reversed(queue)]
+    return [word[0] for word in sorted(queue, key=lambda item: item[1], reverse=True)]
 
 
 def _check_words(queue, words):
@@ -53,53 +55,35 @@ def _check_words(queue, words):
             queue.append((word, len_word))
             continue
 
-        queue = sorted(queue, key=lambda x: x[1])
-        if len_word > queue[0][1]:
-            queue.append((word, len_word))
-            queue.pop(0)
+        index_word_len = min(enumerate(queue), key=lambda item: item[1][1])
+        if len_word > index_word_len[1][1]:
+            queue[index_word_len[0]] = (word, len_word)
     return queue
 
 
 def get_rarest_char(file_path: str) -> str:
     counter = Counter()
     for line in _get_lines(file_path):
-        _check_char_in(line, counter)
-    return list(reversed(counter.most_common()))[0][0]
-
-
-def _check_char_in(line, counter):
-    for char in line:
-        if char not in string.punctuation and ord(char) < 126:
-            counter.count(char)
+        [counter.add(char) for char in line if char.isalpha()]
+    return list(reversed(counter.sort_counter))[0][0]
 
 
 def count_punctuation_chars(file_path: str) -> int:
     counter = 0
     for line in _get_lines(file_path):
-        for char in line:
-            counter = _check_punctuation(char, counter)
+        counter += sum([1 for char in line if char in PUNCTUATION])
     return counter
 
 
-def _check_punctuation(char, counter):
-    if char in string.punctuation:
-        counter += 1
-    return counter
-
-
-def count_non_ascii_chars(file_path: str) -> int:  # noqa: CCR001
+def count_non_ascii_chars(file_path: str) -> int:
     counter = 0
     for line in _get_lines(file_path):
-        for char in line:
-            if ord(char) > 126:
-                counter += 1
+        counter += sum([1 for char in line if not char.isascii()])
     return counter
 
 
-def get_most_common_non_ascii_char(file_path: str) -> str:  # noqa: CCR001
+def get_most_common_non_ascii_char(file_path: str) -> str:
     counter = Counter()
     for line in _get_lines(file_path):
-        for char in line:
-            if ord(char) > 126:
-                counter.count(char)
-    return counter.most_common()[0][0]
+        [counter.add(char) for char in line if not char.isascii()]
+    return counter.sort_counter[0][0]

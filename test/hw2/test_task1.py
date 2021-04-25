@@ -11,7 +11,7 @@ from All_home_works.hw2.task1 import (
 
 TEXT = """
 Lorem Ipsum is simply dummy text of the printing and typesettingLalaBlabla
- industryDrvgtr. 1 Rarest non ascii is \u00dc and Most common \u00e4
+industryDrvgtr. 1 Rarest non ascii is \u00dc and Most common \u00e4
 Lorem Ipsum has been the industry's \u00e4 2 standard dummy text ever since the 1500s, 3
 when an \u00e4 unknown printer took a galley of type and scrambled it to make a type specimen book. 4
 It has survived not only five centuries, 5 but also the leap into electronic typesetting, 6
