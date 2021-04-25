@@ -6,7 +6,3 @@ def test_sum_of_slow_calculate():
     result = sum_of_slow_calculate()
 
     assert expected == result
-
-
-if __name__ == "__main__":
-    test_sum_of_slow_calculate()
