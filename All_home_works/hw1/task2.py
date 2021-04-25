@@ -23,7 +23,7 @@ def find_maximum_and_minimum(file_name: str) -> Tuple[int, int]:
 
 
 def get_first_value_in(data_file):
-    line = data_file.readline()[:-1]
+    line = data_file.readline().rstrip("\n")
     min_value, max_value, = (
         int(line),
         int(line),
