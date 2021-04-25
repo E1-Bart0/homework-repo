@@ -22,10 +22,17 @@ from typing import List, Tuple
 
 
 def major_and_minor_elem(inp: List) -> Tuple[int, int]:
-    count = Counter()
+    counter = Counter()
     for num in inp:
-        count[num] += 1
-    counter = count.most_common()
-    max_common = counter[0][0]
-    min_common = counter[-1][0]
-    return max_common, min_common
+        counter[num] += 1
+    return get_minor_major_from(counter)
+
+
+def get_minor_major_from(counter):
+    minor = major = counter.popitem()
+    for word, counts in counter.items():
+        if counts > major[1]:
+            major = (word, counts)
+        elif counts < minor[1]:
+            minor = (word, counts)
+    return major[0], minor[0]
