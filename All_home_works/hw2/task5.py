@@ -16,14 +16,13 @@ assert = custom_range(string.ascii_lowercase, 'p', 'g', -2) == ['p', 'n', 'l', '
 """
 
 
-def custom_range(iterable, start=None, stop=None, step=None):
+def custom_range(iterable, *args):
     iterable = list(iterable)
-    if stop is None:
-        stop = iterable.index(start)
+    if len(args) == 1:
+        stop = iterable.index(args[0])
         start = 0
     else:
-        stop = iterable.index(stop)
-        start = iterable.index(start)
-
-    step = step or 1
+        stop = iterable.index(args[1])
+        start = iterable.index(args[0])
+    step = args[2] if len(args) == 3 else 1
     return iterable[start:stop:step]

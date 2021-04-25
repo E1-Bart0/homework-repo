@@ -21,3 +21,8 @@ def test_custom_range_str_start__stop__step():
 
 def test_custom_range_not_str():
     assert [1] == custom_range([2, 1, 0], 1, 0)
+
+
+def test_custom_range_if_none_is_stop():
+    data = [1, 2, 3, None, 4, 5]
+    assert [1, 2, 3] == custom_range(data, 1, None)
