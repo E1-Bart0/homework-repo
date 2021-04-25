@@ -10,11 +10,9 @@ def f(attr=None):
 
 def test__cache():
     input_data = 1
-    assert 1 == f(input_data)
-    for _ in range(N - 1):
-        assert 1 == f()
-    assert not f()
-
-
-if __name__ == "__main__":
-    test__cache()
+    solution = f(input_data)
+    assert solution is f()
+    assert solution is f()
+    assert solution is f()
+    assert solution is f()
+    assert solution is not f(input_data)

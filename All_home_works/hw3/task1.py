@@ -31,7 +31,7 @@ def cache(times=0):
         def inner_wrapper(*args, **kwargs):
             _check_counter(memo, times)
 
-            if not memo["result"]:
+            if memo["counter"] == times:
                 memo["result"] = func(*args, **kwargs)
 
             return memo["result"]
@@ -42,7 +42,6 @@ def cache(times=0):
 
 
 def _check_counter(memo, times):
-    memo["counter"] -= 1
     if memo["counter"] < 1:
         memo["counter"] = times + 1
-        memo["result"] = None
+    memo["counter"] -= 1
