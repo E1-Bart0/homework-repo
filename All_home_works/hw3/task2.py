@@ -23,6 +23,19 @@ import struct
 import time
 from multiprocessing import Pool
 
+import matplotlib.pyplot as plt
+
+
+def timer(func):
+    def wrapper(num):
+        start = time.time()
+        res = func(num)
+        finish = time.time() - start
+        finish_per_number = finish / num
+        return res, finish, finish_per_number
+
+    return wrapper
+
 
 def slow_calculate(value):
     time.sleep(random.randint(1, 3))  # noqa: S311
@@ -30,7 +43,25 @@ def slow_calculate(value):
     return sum(struct.unpack("<" + "B" * len(data), data))
 
 
+@timer
 def sum_of_slow_calculate(max_value=500):
     pool = Pool(processes=max_value)
     array = pool.map(slow_calculate, range(max_value))
     return sum(array)
+
+
+def get_data(data):
+    res = []
+    [res.append(sum_of_slow_calculate(i)[1:]) for i in data]
+    return res
+
+
+def plot():
+    x = list(range(1, 50)) + list(range(50, 500, 50))
+    y = get_data(x)
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.plot(
+        x,
+        y,
+    )
+    plt.show()
