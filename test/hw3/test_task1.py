@@ -1,18 +1,18 @@
+from unittest.mock import patch
+
 from All_home_works.hw3.task1 import cache
 
-N = 4
+
+@cache(times=2)
+def f():
+    return input("? ")
 
 
-@cache(times=N)
-def f(attr=None):
-    return attr
-
-
-def test__cache():
-    input_data = 1
-    solution = f(input_data)
-    assert solution is f()
-    assert solution is f()
-    assert solution is f()
-    assert solution is f()
-    assert solution is not f()
+@patch("hw3.test_task1.f", return_value=2)
+def test__cache(f):
+    function = cache(3)(f)
+    function()
+    function()
+    function()
+    function()
+    assert 1 == len(f.mock_calls)
