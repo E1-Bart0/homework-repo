@@ -9,8 +9,8 @@ Given a file containing text. Complete using only default collections:
 import string
 from typing import List
 
-PUNCTUATION = {char: "" for char in string.punctuation}
-CROP_PUNCTUATION = str.maketrans(PUNCTUATION)
+PUNCTUATION = set(string.punctuation)
+CROP_PUNCTUATION = str.maketrans({char: "" for char in PUNCTUATION})
 
 
 class Counter:
