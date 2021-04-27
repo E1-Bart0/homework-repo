@@ -10,7 +10,7 @@ import string
 from typing import List
 
 PUNCTUATION = set(string.punctuation)
-CROP_PUNCTUATION = str.maketrans({char: "" for char in PUNCTUATION})
+CROP_PUNCTUATION = str.maketrans("", "", string.punctuation)
 
 
 class Counter:
@@ -21,7 +21,7 @@ class Counter:
         if key in self.counter:
             self.counter[key] += 1
         else:
-            self.counter[key] = 0
+            self.counter[key] = 1
 
     @property
     def sort_counter(self):
@@ -29,6 +29,14 @@ class Counter:
             self.counter.items(), key=lambda item: item[1], reverse=True
         )
         return list(sorted_counter)
+
+    @property
+    def rarest_element(self):
+        return min(self.sort_counter, key=lambda item: item[1])[0]
+
+    @property
+    def most_common(self):
+        return max(self.sort_counter, key=lambda item: item[1])[0]
 
 
 def _get_lines(file_path: str) -> str:
@@ -65,25 +73,27 @@ def get_rarest_char(file_path: str) -> str:
     counter = Counter()
     for line in _get_lines(file_path):
         [counter.add(char) for char in line if char.isalpha()]
-    return list(reversed(counter.sort_counter))[0][0]
+    return counter.rarest_element
 
 
 def count_punctuation_chars(file_path: str) -> int:
     counter = 0
     for line in _get_lines(file_path):
-        counter += sum([1 for char in line if char in PUNCTUATION])
+        counter += sum(1 for char in line if char in PUNCTUATION)
     return counter
 
 
 def count_non_ascii_chars(file_path: str) -> int:
     counter = 0
     for line in _get_lines(file_path):
-        counter += sum([1 for char in line if not char.isascii()])
+        counter += sum(1 for char in line if not char.isascii())
     return counter
 
 
-def get_most_common_non_ascii_char(file_path: str) -> str:
+def get_most_common_non_ascii_char(file_path: str) -> str:  # noqa: CCR001
     counter = Counter()
     for line in _get_lines(file_path):
-        [counter.add(char) for char in line if not char.isascii()]
-    return counter.sort_counter[0][0]
+        for char in line:
+            if not char.isascii():
+                counter.add(char)
+    return counter.most_common

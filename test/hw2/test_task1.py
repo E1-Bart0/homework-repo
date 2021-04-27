@@ -43,7 +43,7 @@ class TestTask1(unittest.TestCase):
         assert result_start_with == checking[: len(result_start_with)]
 
     def test_get_rarest_char(self):
-        rarest_char = "z"
+        rarest_char = "B"
         assert rarest_char == get_rarest_char(self.file.name)
 
     def test_count_punctuation_chars(self):
