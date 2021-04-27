@@ -33,16 +33,6 @@ def make_filter(**kwargs):
     return Filter(*filter_funcs)
 
 
-sample_data = [
-    {
-        "name": "Bill",
-        "last_name": "Gilbert",
-        "occupation": "was here",
-        "type": "person",
-    },
-    {"is_dead": True, "kind": "parrot", "type": "bird", "name": "polly"},
-]
-
 # make_filter(name='polly', type='bird').apply(sample_data) should return only second entry from the list
 
 # There are multiple bugs in this code. Find them all and write tests for faulty cases.
