@@ -1,18 +1,13 @@
-from unittest.mock import patch
+from unittest.mock import Mock
 
 from All_home_works.hw3.task1 import cache
 
 
-@cache(times=2)
-def f():
-    return input("? ")
-
-
-@patch("hw3.test_task1.f", return_value=2)
-def test__cache(f):
-    function = cache(3)(f)
-    function()
-    function()
-    function()
-    function()
-    assert 1 == len(f.mock_calls)
+def test__cache_decorator():
+    inner_function = Mock()
+    inner_function_with_decorator = cache(times=3)(inner_function)
+    inner_function_with_decorator()
+    inner_function_with_decorator()
+    inner_function_with_decorator()
+    inner_function_with_decorator()
+    inner_function.assert_called_once_with()
