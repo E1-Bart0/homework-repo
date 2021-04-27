@@ -32,22 +32,22 @@ def test_filter__positive_even__data_with_negative_numbers_in_data():
     assert expected == result
 
 
-def test_filter__make_functions__valid_for_only_one_dict():
+def test_filter__make_functions__valid_for_only_one_item():
     expected = TEST_DATA[1]
     result = make_filter(name="polly", type="bird").apply(TEST_DATA)
     assert expected == result[0]
 
 
-def test_filter__make_functions__valid_for_all_dict():
+def test_filter__make_functions__valid_for_all_items():
     result = make_filter(valid=True).apply(TEST_DATA)
     assert TEST_DATA == result
 
 
-def test_filter__make_functions__not_valid_for_all_dict():
+def test_filter__make_functions__not_valid_for_items():
     result = make_filter(valid=False).apply(TEST_DATA)
     assert [] == result
 
 
-def test_filter__make_functions__not_valid_for_all_dict_with_not_existing_key():
+def test_filter__make_functions__not_valid_for_all_item_with_not_existing_key():
     result = make_filter(not_valid=True).apply(TEST_DATA)
     assert not result
