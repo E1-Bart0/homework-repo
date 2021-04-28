@@ -25,7 +25,7 @@ def test_urlopen__with_right_url(urlopen):
 
 
 @patch("urllib.request.urlopen", side_effect=ValueError("BAD URL"))
-def test_urlopen__with_invalid_url():
+def test_urlopen__with_invalid_url(urlopen):
     with pytest.raises(ValueError, match="BAD URL"):
         count_dots_on_i("BAD URL")
 
