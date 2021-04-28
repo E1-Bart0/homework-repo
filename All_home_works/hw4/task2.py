@@ -26,5 +26,5 @@ def count_dots_on_i(url: str) -> int:
     with request.urlopen(url) as html:  # noqa: S310
         counter = 0
         for line in html:
-            counter += len([1 for char in line.decode("utf-8") if char == "i"])
+            counter += sum(1 for char in line.decode("utf-8") if char == "i")
     return counter
