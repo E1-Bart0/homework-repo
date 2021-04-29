@@ -50,4 +50,4 @@ def test_filter__make_functions__not_valid_for_items():
 
 def test_filter__make_functions__not_valid_for_all_item_with_not_existing_key():
     result = make_filter(not_valid=True).apply(TEST_DATA)
-    assert not result
+    assert [] == result
