@@ -35,5 +35,5 @@ def get_first_line(path):
 def read_magic_number(path: str) -> bool:
     line = get_first_line(path)
     if line.isnumeric():
-        return True if 1 <= int(line) < 3 else False
+        return 1 <= int(line) < 3
     raise ValueError(f"Expected a digit, got: {line}")
