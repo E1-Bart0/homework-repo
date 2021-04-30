@@ -18,7 +18,6 @@ Calculate total sum of slow_calculate() of all numbers starting from 0 to 500.
   You are not allowed to modify slow_calculate function.
 """
 import hashlib
-import os
 import random
 import struct
 import time
@@ -32,6 +31,6 @@ def slow_calculate(value):
 
 
 def sum_of_slow_calculate(max_value=500):
-    pool = Pool(processes=os.cpu_count())
+    pool = Pool(processes=max_value)
     array = pool.map(slow_calculate, range(max_value + 1))
     return sum(array)
