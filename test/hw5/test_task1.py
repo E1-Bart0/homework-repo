@@ -31,7 +31,7 @@ def test_homework__init(time):
 
     expired_homework = Homework(text, deadline)
     assert expired_homework.created == TIME
-    assert expired_homework.deadline == TIME + datetime.timedelta(days=deadline)
+    assert expired_homework.deadline == datetime.timedelta(days=deadline)
     assert expired_homework.text == text
 
 
@@ -45,7 +45,7 @@ def test_teacher__create_home_work(time):
     create_homework = Teacher.create_homework(text, deadline)
     assert isinstance(create_homework, Homework)
     assert create_homework.text == text
-    assert create_homework.deadline == TIME + datetime.timedelta(days=deadline)
+    assert create_homework.deadline == datetime.timedelta(days=deadline)
     assert create_homework.text == text
 
 
