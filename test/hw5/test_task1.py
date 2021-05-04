@@ -70,6 +70,6 @@ def test_student__do_homework__expired_homework(time, capsys):
 
     time.now.return_value = TIME + datetime.timedelta(days=6)
     done_homework = Student.do_homework(homework)
-    out, err = capsys.readouterr()
-    assert "You are late\n" == out
+    capture = capsys.readouterr()
+    assert "You are late\n" == capture.out
     assert None is done_homework
