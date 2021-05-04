@@ -58,9 +58,10 @@ class HomeworkResult:
     def __init__(self, author, homework, solution):
         if not isinstance(homework, Homework):
             raise InstanceNotHomeworkError(homework)
-        self.homework = homework
-        self.author = author
         self.solution = solution
+        self.author = author
+        self.created = datetime.datetime.now()
+        self.homework = homework
 
     def __str__(self):
         return (
@@ -76,9 +77,11 @@ class Human:
 
 class Student(Human):
     def do_homework(self, homework, solution):
-        if homework.is_active():
-            return HomeworkResult(author=self, homework=homework, solution=solution)
-        raise DeadlineError(homework.created + homework.deadline)
+        if isinstance(homework, Homework):
+            if homework.is_active():
+                return HomeworkResult(author=self, homework=homework, solution=solution)
+            raise DeadlineError(homework.created + homework.deadline)
+        raise InstanceNotHomeworkError(homework)
 
 
 class Teacher(Human):
@@ -113,3 +116,4 @@ class DeadlineError(Exception):
     def __init__(self, deadline: datetime):
         deadline = datetime.datetime.strftime(deadline, "%d %B")
         self.messages = f'You are late. Deadline was: "{deadline}"'
+        super().__init__(self.messages)
