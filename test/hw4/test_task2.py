@@ -4,8 +4,6 @@ import pytest
 
 from All_home_works.hw4.task2 import count_dots_on_i
 
-URL = "https://example.com/"
-
 
 class Response:
     def __init__(self, data: str):
@@ -20,19 +18,16 @@ class Response:
 
 @patch("urllib.request.urlopen")
 def test_urlopen__with_right_url(urlopen):
-    count_dots_on_i(URL)
-    urlopen.assert_called_with(URL)
+    url = "fake-url"
+    expect = 2
+    urlopen.return_value = Response("<div> </div>")
+
+    res = count_dots_on_i(url)
+    urlopen.assert_called_with(url)
+    assert expect == res
 
 
 @patch("urllib.request.urlopen", side_effect=ValueError("BAD URL"))
 def test_urlopen__with_invalid_url(urlopen):
     with pytest.raises(ValueError, match="BAD URL"):
         count_dots_on_i("BAD URL")
-
-
-@patch("urllib.request.urlopen")
-def test_count_dots_on_i__check_valid_data(urlopen):
-    expect = 2
-    urlopen.return_value = Response("<div> </div>")
-    res = count_dots_on_i(URL)
-    assert expect == res
