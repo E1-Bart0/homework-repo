@@ -47,11 +47,11 @@ from collections import defaultdict
 class Homework:
     def __init__(self, text, deadline):
         self.text = text
-        self.deadline = datetime.datetime.now() + datetime.timedelta(days=deadline)
+        self.deadline = datetime.timedelta(days=deadline)
         self.created = datetime.datetime.now()
 
     def is_active(self):
-        return datetime.datetime.now() < self.deadline
+        return datetime.datetime.now() < self.created + self.deadline
 
 
 class HomeworkResult:
@@ -78,7 +78,7 @@ class Student(Human):
     def do_homework(self, homework, solution):
         if homework.is_active():
             return HomeworkResult(author=self, homework=homework, solution=solution)
-        raise DeadlineError(homework.deadline)
+        raise DeadlineError(homework.created + homework.deadline)
 
 
 class Teacher(Human):
