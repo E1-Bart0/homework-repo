@@ -26,22 +26,23 @@ f()
 
 def cache(times=0):
     def wrapper(func):
-        memo = {"result": None, "counter": times + 1}
+        memo = {}
 
         def inner_wrapper(*args, **kwargs):
-            _check_counter(memo, times)
+            call = frozenset(args) | frozenset(kwargs)
 
-            if memo["counter"] == times:
-                memo["result"] = func(*args, **kwargs)
+            if not _check_call_in_memo(call, memo):
+                memo[call] = {"result": func(*args, **kwargs), "counter": times}
 
-            return memo["result"]
+            return memo[call]["result"]
 
         return inner_wrapper
 
     return wrapper
 
 
-def _check_counter(memo, times):
-    if memo["counter"] < 1:
-        memo["counter"] = times + 1
-    memo["counter"] -= 1
+def _check_call_in_memo(call, memo):
+    if call in memo and memo[call]["counter"] > 0:
+        memo[call]["counter"] -= 1
+        return True
+    return False
