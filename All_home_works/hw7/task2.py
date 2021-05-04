@@ -19,13 +19,12 @@ def backspace_compare(first: str, second: str) -> bool:
     return get_filtered(first) == get_filtered(second)
 
 
-def get_filtered(string):
-    def filter_function(args):
-        index, char = args
-        next_char_index = min(index + 1, len(string) - 1)
-        if char == "#" or string[next_char_index] == "#":
-            return False
-        return True
-
-    filtered = filter(filter_function, enumerate(string))
-    return [item[1] for item in filtered]
+def get_filtered(string):  # noqa: CCR001
+    result = []
+    for char in string:
+        if char == "#":
+            if result:
+                result.pop()
+            continue
+        result.append(char)
+    return result
