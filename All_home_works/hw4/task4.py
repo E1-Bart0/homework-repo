@@ -29,14 +29,14 @@ def compare_number_if_fizzbuzz(number):
 
     Numbers divisible by 15 become fizz buzz
     >>> compare_number_if_fizzbuzz(15)
-    'Fizz Buzz'
+    'FizzBuzz'
 
     Else return number
     >>> compare_number_if_fizzbuzz(1)
     '1'
     """
     if number % 15 == 0:
-        return "Fizz Buzz"
+        return "FizzBuzz"
     elif number % 5 == 0:
         return "Buzz"
     elif number % 3 == 0:
@@ -47,7 +47,7 @@ def compare_number_if_fizzbuzz(number):
 def fizzbuzz(n: int) -> List[str]:
     """
     >>> fizzbuzz(15)
-    ['1', '2', 'Fizz', '4', 'Buzz', 'Fizz', '7', '8', 'Fizz', 'Buzz', '11', 'Fizz', '13', '14', 'Fizz Buzz']
+    ['1', '2', 'Fizz', '4', 'Buzz', 'Fizz', '7', '8', 'Fizz', 'Buzz', '11', 'Fizz', '13', '14', 'FizzBuzz']
 
     """
-    return list(map(compare_number_if_fizzbuzz, range(1, n + 1)))
+    return [compare_number_if_fizzbuzz(num) for num in range(1, n + 1)]
