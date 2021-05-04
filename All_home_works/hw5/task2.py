@@ -19,11 +19,11 @@ import functools
 def keep_info(main_func):
     def wrapper(main_wrapper):
         def inner_wrapper(*args, **kwargs):
-            inner_wrapper.__doc__ = main_func.__doc__
-            inner_wrapper.__name__ = main_func.__name__
-            inner_wrapper.__original_func = main_func
             return main_wrapper(*args, **kwargs)
 
+        inner_wrapper.__doc__ = main_func.__doc__
+        inner_wrapper.__name__ = main_func.__name__
+        inner_wrapper.__original_func = main_func
         return inner_wrapper
 
     return wrapper
@@ -44,17 +44,3 @@ def print_result(func):
 def custom_sum(*args):
     """This function can sum any objects which have __add___"""
     return functools.reduce(lambda x, y: x + y, args)
-
-
-custom_sum(1, 2, 3, 4)
-
-if __name__ == "__main__":
-    custom_sum([1, 2, 3], [4, 5])
-    custom_sum(1, 2, 3, 4)
-
-    print(custom_sum.__doc__)  # noqa: T001
-    print(custom_sum.__name__)  # noqa: T001
-    without_print = custom_sum.__original_func
-
-    # the result returns without printing
-    without_print(1, 2, 3, 4)
