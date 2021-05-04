@@ -63,11 +63,13 @@ def test_student__do_homework__oop_homework(time):
 @patch(
     "All_home_works.hw5.task1.datetime.datetime",
 )
-def test_student__do_homework__expired_homework(time):
+def test_student__do_homework__expired_homework(time, capsys):
     text, deadline = "Learn functions", 5
     time.now.return_value = TIME
     homework = Homework(text, deadline)
 
     time.now.return_value = TIME + datetime.timedelta(days=6)
     done_homework = Student.do_homework(homework)
+    out, err = capsys.readouterr()
+    assert "You are late\n" == out
     assert None is done_homework
