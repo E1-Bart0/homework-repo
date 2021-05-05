@@ -10,7 +10,7 @@ from typing import Any
 
 def find_occurrences(tree: dict, element: Any) -> int:
     counter = 0
-    if tree == element:
+    if tree == element and type(tree) == type(element):
         counter += 1
     elif isinstance(tree, tuple) or isinstance(tree, list) or isinstance(tree, set):
         counter += find_occurrences_in_list(tree, element)
