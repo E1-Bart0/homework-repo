@@ -24,19 +24,12 @@ class Counter:
             self.counter[key] = 1
 
     @property
-    def sort_counter(self):
-        sorted_counter = sorted(
-            self.counter.items(), key=lambda item: item[1], reverse=True
-        )
-        return list(sorted_counter)
-
-    @property
     def rarest_element(self):
-        return min(self.sort_counter, key=lambda item: item[1])[0]
+        return min(self.counter, key=self.counter.get)
 
     @property
     def most_common(self):
-        return max(self.sort_counter, key=lambda item: item[1])[0]
+        return max(self.counter, key=self.counter.get)
 
 
 def _get_lines(file_path: str) -> str:
