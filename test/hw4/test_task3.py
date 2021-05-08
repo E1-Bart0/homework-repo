@@ -3,15 +3,15 @@ import pytest
 from All_home_works.hw4.task3 import my_precious_logger
 
 
-def test_my_precious_logger__error_msg__test_msg_in_stderr(capsys):
-    error = "error: 404"
-    my_precious_logger(text=error)
+@pytest.mark.parametrize("input_data", ["error: 404", "error 404", "errorerrorText"])
+def test_my_precious_logger__error_msg__test_msg_in_stderr(capsys, input_data):
+    my_precious_logger(text=input_data)
     captured = capsys.readouterr()
-    assert captured.err == error
+    assert captured.err == input_data
     assert not captured.out
 
 
-@pytest.mark.parametrize("input_data", ["Error: 404", "error 404"])
+@pytest.mark.parametrize("input_data", ["Error: 404", "ERROR: 404"])
 def test_my_precious_logger__error_msg_with_invalid_error_text__test_msg_not_in_stderr(
     capsys, input_data
 ):

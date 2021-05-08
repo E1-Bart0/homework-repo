@@ -19,5 +19,5 @@ import sys
 
 
 def my_precious_logger(text: str):
-    out = sys.stderr if text.startswith("error:") else sys.stdout
+    out = sys.stderr if text.startswith("error") else sys.stdout
     out.write(text)
