@@ -14,7 +14,7 @@ from All_home_works.hw7.task2 import backspace_compare
 )
 def test__backspace_compare__with_backspace__expected_true(first, second, expected):
     result = backspace_compare(first, second)
-    assert expected is result
+    assert result
 
 
 @pytest.mark.parametrize(  # noqa: PT006
