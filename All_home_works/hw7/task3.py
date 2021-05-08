@@ -15,20 +15,20 @@ Example:
      [x, x, x]]
      Return value should be "x wins!"
 """
+from itertools import chain
 from typing import List
-
-import numpy as np
 
 
 def tic_tac_toe_checker(board: List[List]) -> str:
     result = set()
     for line in _get_all_lines(board):
-        _if_all_element_same__add_to(result, line)
+        if len(set(line)) == 1 and line[0] != "-":
+            result.add(line[0])
     return _analyze(result, board)
 
 
 def _analyze(result, board):
-    if not len(result) and "-" in np.ravel(board):
+    if not len(result) and "-" in chain(*board):
         return "unfinished!"
     elif len(result) % 2 == 0:
         return "draw!"
@@ -37,14 +37,12 @@ def _analyze(result, board):
 
 
 def _get_all_lines(board):
-    rows = np.array(board)
-    yield from rows
-    yield from rows.T
-    yield rows.diagonal()
-    yield np.fliplr(rows).diagonal()
+    diagonal, reverse_diagonal = [], []
+    for index, row in enumerate(board):
+        diagonal.append(row[index])
+        reverse_diagonal.append(row[len(row) - 1 - index])
+        yield row
+        yield [row[index] for row in board]
 
-
-def _if_all_element_same__add_to(res, line):
-    if len(set(line)) == 1:
-        if line[0] != "-":
-            res.add(line[0])
+    yield diagonal
+    yield reverse_diagonal
