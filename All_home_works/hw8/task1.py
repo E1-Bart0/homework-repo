@@ -28,7 +28,7 @@ import string
 
 
 class KeyValueStorage:
-    allowed_chars = set(string.digits) | set(string.ascii_letters) | set("_")
+    allowed_chars = {*string.digits, *string.ascii_letters, "_"}
 
     def __init__(self, path):
         self.path = path
@@ -44,13 +44,14 @@ class KeyValueStorage:
         for line in self._get_lines_from_file():
             attr_name, attr_value = line.split("=")
             attr_value = int(attr_value) if attr_value.isdigit() else attr_value
-            self._check_attr_name_on_syntax(attr_name)
+            self._checking_if_valid(attr_name)
             data[attr_name] = attr_value
         return data
 
-    def _check_attr_name_on_syntax(self, name):
+    @classmethod
+    def _checking_if_valid(cls, name):
         for index, char in enumerate(name):
-            if name[0].isdigit() or char not in self.allowed_chars:
+            if name[0].isdigit() or char not in cls.allowed_chars:
                 raise ValueError(
                     f"Syntax error: Not valid method name: '{name}' char index: {index}"
                 )
@@ -64,7 +65,7 @@ class KeyValueStorage:
     def _get_value_if_exists(self, item):
         value = self.data.get(item, None)
         if value is None:
-            raise AttributeError(
+            raise ValueError(
                 f"'{KeyValueStorage.__name__}' object has no attribute '{item}'"
             )
         return value
