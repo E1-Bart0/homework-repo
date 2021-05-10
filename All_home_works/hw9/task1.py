@@ -21,15 +21,19 @@ def merge_sorted_files(file_list: List[Union[Path, str]]) -> Iterator:
         (index, next(number, float("inf")))
         for index, number in enumerate(num_generators)
     ]
-    while not all(num[1] == float("inf") for num in numbers):
-        yield _get_min_number(numbers, num_generators)
+    stop = all(num[1] == float("inf") for num in numbers)
+    while not stop:
+        num, stop = _get_min_number(numbers, num_generators, stop)
+        yield num
 
 
-def _get_min_number(numbers, num_generators):
+def _get_min_number(numbers, num_generators, stop):
     index, num = min(numbers, key=lambda x: x[1])
     next_number = next(num_generators[index], float("inf"))
     numbers[index] = (index, next_number)
-    return num
+    if next_number == float("inf"):
+        stop = all(num[1] == float("inf") for num in numbers)
+    return num, stop
 
 
 def _get_nums_from_file(filename):
