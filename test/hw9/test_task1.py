@@ -23,7 +23,7 @@ def test__get_nums_from_file(filename):
 
 
 @patch("All_home_works.hw9.task1._get_nums_from_file", return_value=iter([1, 2, 3, 4]))
-def test__merge_sorted_files__check_one_file(_get_nums_from_file):  # noqa: PT019
+def test__merge_sorted_files__check_one_file(get_nums_from_file):
     file_list = ["test"]
     result = merge_sorted_files(file_list)
     assert [1, 2, 3, 4] == list(result)
@@ -33,7 +33,7 @@ def test__merge_sorted_files__check_one_file(_get_nums_from_file):  # noqa: PT01
     "All_home_works.hw9.task1._get_nums_from_file",
     side_effect=[iter([1, 3, 5]), iter([2, 4, 6])],
 )
-def test__merge_sorted_files__check_two_files(_get_nums_from_file):  # noqa: PT019
+def test__merge_sorted_files__check_two_files(get_nums_from_file):
     file_list = ["test", "test"]
     result = merge_sorted_files(file_list)
     assert [1, 2, 3, 4, 5, 6] == list(result)
@@ -43,8 +43,8 @@ def test__merge_sorted_files__check_two_files(_get_nums_from_file):  # noqa: PT0
     "All_home_works.hw9.task1._get_nums_from_file",
     side_effect=[iter([]), iter([2, 4, 6])],
 )
-def test__merge_sorted_files__check_two_files_but_one_file_is_empty(  # noqa: PT019
-    _get_nums_from_file,
+def test__merge_sorted_files__check_two_files_but_one_file_is_empty(
+    get_nums_from_file,
 ):
     file_list = ["test", "test"]
     result = merge_sorted_files(file_list)
@@ -55,8 +55,8 @@ def test__merge_sorted_files__check_two_files_but_one_file_is_empty(  # noqa: PT
     "All_home_works.hw9.task1._get_nums_from_file",
     side_effect=[iter([1, 10]), iter([2, 3, 4, 6])],
 )
-def test__merge_sorted_files__check_two_files_but_one_file_is_longer_then_another(  # noqa: PT019
-    _get_nums_from_file,
+def test__merge_sorted_files__check_two_files_but_one_file_is_longer_then_another(
+    get_nums_from_file,
 ):
     file_list = ["test", "test"]
     result = merge_sorted_files(file_list)
@@ -67,7 +67,7 @@ def test__merge_sorted_files__check_two_files_but_one_file_is_longer_then_anothe
     "All_home_works.hw9.task1._get_nums_from_file",
     side_effect=[iter([1, 6]), iter([2, 4]), iter([3, 5])],
 )
-def test__merge_sorted_files__check_tree_files(_get_nums_from_file):  # noqa: PT019
+def test__merge_sorted_files__check_tree_files(get_nums_from_file):
     file_list = ["test", "test", "test"]
     result = merge_sorted_files(file_list)
     assert [1, 2, 3, 4, 5, 6] == list(result)
