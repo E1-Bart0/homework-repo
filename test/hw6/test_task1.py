@@ -108,5 +108,4 @@ def test__instance_attributes_overwrite_decorators_methods__but_in_class_methods
     assert test_class.reset_instances_counter == "reset"
 
     assert 1 == Test.get_created_instances()
-    with pytest.raises(TypeError, match="'str' object is not callable"):
-        test_class.get_created_instances()
+    assert isinstance(test_class.get_created_instances, str)
