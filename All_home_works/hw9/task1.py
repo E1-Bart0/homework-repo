@@ -21,8 +21,8 @@ def merge_sorted_files(file_list: List[Union[Path, str]]) -> Iterator:
         (index, next(number, float("inf")))
         for index, number in enumerate(num_generators)
     ]
-    stop = all(num[1] == float("inf") for num in numbers)
-    while not stop:
+    stop = sum(num[1] == float("inf") for num in numbers)
+    while stop < len(numbers):
         num, stop = _get_min_number(numbers, num_generators, stop)
         yield num
 
@@ -32,7 +32,7 @@ def _get_min_number(numbers, num_generators, stop):
     next_number = next(num_generators[index], float("inf"))
     numbers[index] = (index, next_number)
     if next_number == float("inf"):
-        stop = all(num[1] == float("inf") for num in numbers)
+        stop += 1
     return num, stop
 
 
