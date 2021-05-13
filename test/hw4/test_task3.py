@@ -21,6 +21,16 @@ def test_my_precious_logger__error_msg_with_invalid_error_text__test_msg_not_in_
     assert not captured.err
 
 
+@pytest.mark.parametrize("input_data", [" error: 404", "An error: 404"])
+def test_my_precious_logger__if_error_in_line_but_line_starts_with_no_error__msg_in_stdout(
+    capsys, input_data
+):
+    my_precious_logger(text=input_data)
+    captured = capsys.readouterr()
+    assert input_data == captured.out
+    assert not captured.err
+
+
 def test_my_precious_logger__ordinary_msg__test_msg_in_stdout(capsys):
     text = "200"
     my_precious_logger(text=text)
