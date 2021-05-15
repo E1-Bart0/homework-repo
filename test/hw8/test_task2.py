@@ -60,7 +60,9 @@ def test_table_data__if_len_correct__after_update_storage(updated_db):
     assert 3 == len(storage)
 
 
-def test_table_data__get_row_from_db_by_name(create_db_table):
+def test_table_data__get_row_from_db_by_name_if_not_such_row_none_expect(
+    create_db_table,
+):
     db_name, db_table = create_db_table
     storage = TableData(db_name, db_table)
     assert {"name": "Book1", "author": "John Doe"} == storage["Book1"]
