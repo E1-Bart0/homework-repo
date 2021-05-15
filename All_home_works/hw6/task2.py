@@ -56,12 +56,18 @@ class Homework:
 
 class HomeworkResult:
     def __init__(self, author, homework, solution):
-        if not isinstance(homework, Homework):
-            raise InstanceNotHomeworkError(homework)
+        self.check_homework(homework)
         self.solution = solution
         self.author = author
         self.created = datetime.datetime.now()
         self.homework = homework
+
+    @staticmethod
+    def check_homework(homework):
+        if not isinstance(homework, Homework):
+            raise InstanceNotHomeworkError(homework)
+        if not homework.is_active():
+            raise DeadlineError(homework)
 
     def __str__(self):
         return (
@@ -77,11 +83,7 @@ class Human:
 
 class Student(Human):
     def do_homework(self, homework, solution):
-        if isinstance(homework, Homework):
-            if homework.is_active():
-                return HomeworkResult(author=self, homework=homework, solution=solution)
-            raise DeadlineError(homework.created + homework.deadline)
-        raise InstanceNotHomeworkError(homework)
+        return HomeworkResult(author=self, homework=homework, solution=solution)
 
 
 class Teacher(Human):
@@ -106,14 +108,15 @@ class Teacher(Human):
         return Homework(text=text, deadline=deadline)
 
 
-class InstanceNotHomeworkError(Exception):
+class InstanceNotHomeworkError(BaseException):
     def __init__(self, homework):
         self.messages = f"You gave a not Homework object, Got {type(homework)}"
         super().__init__(self.messages)
 
 
-class DeadlineError(Exception):
-    def __init__(self, deadline: datetime):
+class DeadlineError(BaseException):
+    def __init__(self, homework):
+        deadline = homework.created + homework.deadline
         deadline = datetime.datetime.strftime(deadline, "%d %B")
         self.messages = f'You are late. Deadline was: "{deadline}"'
         super().__init__(self.messages)

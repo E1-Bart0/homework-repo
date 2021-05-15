@@ -20,7 +20,8 @@ def teacher():
 
 
 @patch("All_home_works.hw6.task2.datetime.datetime")
-def test_homework_result__attributes(datetime):
+@patch("All_home_works.hw6.task2.Homework.is_active", return_value=True)
+def test_homework_result__attributes(mock, datetime):
     time = 1
     datetime.now.return_value = time
     student = Student("Roman", "Petrov")
