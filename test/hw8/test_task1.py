@@ -33,18 +33,16 @@ def test_key_value_storage__has_attributes_as_item(file_name):
 def test_key_value_storage__not_existing_attributes(file_name):
     storage = KeyValueStorage(file_name)
     with pytest.raises(ValueError, match="object has no attribute"):
-        error = storage.not_existing
+        _ = storage.not_existing
     with pytest.raises(ValueError, match="object has no attribute"):
-        error = storage["not_existing"]  # noqa: F841
+        _ = storage["not_existing"]
 
 
 @patch(
     "All_home_works.hw8.task1.KeyValueStorage._get_lines_from_file",
     return_value=("1not_valid=ERROR",),
 )
-def test_key_value_storage__invalid_attribute_starts_with_digit(
-    get_lines_from_file, file_name
-):
+def test_key_value_storage__invalid_attribute_starts_with_digit(mock, file_name):
     with pytest.raises(ValueError, match="Syntax error: Not valid method name:"):
         KeyValueStorage(file_name)
 
@@ -53,9 +51,7 @@ def test_key_value_storage__invalid_attribute_starts_with_digit(
     "All_home_works.hw8.task1.KeyValueStorage._get_lines_from_file",
     return_value=("not:valid=ERROR",),
 )
-def test_key_value_storage__invalid_attribute_not_legal_char_in_name(
-    get_lines_from_file, file_name
-):
+def test_key_value_storage__invalid_attribute_not_legal_char_in_name(mock, file_name):
     with pytest.raises(ValueError, match="Syntax error: Not valid method name:"):
         KeyValueStorage(file_name)
 
@@ -64,7 +60,7 @@ def test_key_value_storage__invalid_attribute_not_legal_char_in_name(
     "All_home_works.hw8.task1.KeyValueStorage._get_lines_from_file",
     return_value=("path=ERROR",),
 )
-def test_key_value_storage__if_attribute_already_exists(get_lines_from_file, file_name):
+def test_key_value_storage__if_attribute_already_exists(mock, file_name):
     storage = KeyValueStorage(file_name)
     assert storage.path == file_name
     assert storage["path"] == "ERROR"
@@ -75,7 +71,7 @@ def test_key_value_storage__if_attribute_already_exists(get_lines_from_file, fil
     return_value=("foo=1", "foo_method=1"),
 )
 def test_if_attribute_clash_existing_built_in_attributes_take_precedence(
-    get_lines_from_file, file_name
+    mock, file_name
 ):
     class Test(KeyValueStorage):
         @property

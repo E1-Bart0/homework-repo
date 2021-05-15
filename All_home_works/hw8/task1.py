@@ -44,17 +44,10 @@ class KeyValueStorage:
         for line in self._get_lines_from_file():
             attr_name, attr_value = line.split("=")
             attr_value = int(attr_value) if attr_value.isdigit() else attr_value
-            self._checking_if_valid(attr_name)
+            if not attr_name.isidentifier():
+                raise ValueError(f"Syntax error: Not valid method name: '{attr_name}'")
             data[attr_name] = attr_value
         return data
-
-    @classmethod
-    def _checking_if_valid(cls, name):
-        for index, char in enumerate(name):
-            if name[0].isdigit() or char not in cls.allowed_chars:
-                raise ValueError(
-                    f"Syntax error: Not valid method name: '{name}' char index: {index}"
-                )
 
     def __getitem__(self, item):
         return self._get_value_if_exists(item)
