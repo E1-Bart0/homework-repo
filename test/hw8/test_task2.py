@@ -17,16 +17,16 @@ def create_db_table():
 
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
-    cursor.execute(f"CREATE TABLE '{db_table}' (name, author)")  # noqa: S608
+    cursor.execute(f"CREATE TABLE '{db_table}' (name, author)")
     cursor.execute(
-        f"INSERT INTO '{db_table}' (name, author) VALUES ('Book1', 'John Doe')"  # noqa: S608
+        f"INSERT INTO '{db_table}' (name, author) VALUES ('Book1', 'John Doe')"
     )
     cursor.execute(
-        f"INSERT INTO '{db_table}' (name, author) VALUES ('Book2', 'Jain Doe')"  # noqa: S608
+        f"INSERT INTO '{db_table}' (name, author) VALUES ('Book2', 'Jain Doe')"
     )
     conn.commit()
     yield db_name, db_table
-    cursor.execute(f"DROP TABLE '{db_table}'")  # noqa: S608
+    cursor.execute(f"DROP TABLE '{db_table}'")
     conn.commit()
     conn.close()
     directory.cleanup()
@@ -40,7 +40,7 @@ def updated_db(create_db_table):
     conn = sqlite3.connect(db_name)
     cursor = conn.cursor()
     cursor.execute(
-        f"INSERT INTO '{db_table}' (name, author) VALUES ('Test Book', 'Test Author')"  # noqa: S608
+        f"INSERT INTO '{db_table}' (name, author) VALUES ('Test Book', 'Test Author')"
     )
     conn.commit()
     yield storage
