@@ -19,7 +19,7 @@ class SizesEnum(metaclass=SimplifiedEnum):
 
 
 @pytest.mark.parametrize(
-    "cls,attr",
+    ("cls", "attr"),
     [
         (ColorsEnum, "RED"),
         (ColorsEnum, "BLACK"),
@@ -32,7 +32,7 @@ def test_simplified_enum_metaclass_works_fine_for_class(cls, attr):
 
 
 @pytest.mark.parametrize(
-    "cls,attr",
+    ("cls", "attr"),
     [
         (ColorsEnum, "O"),
         (SizesEnum, "O"),
