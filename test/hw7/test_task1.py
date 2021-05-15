@@ -3,8 +3,8 @@ import pytest
 from All_home_works.hw7.task1 import find_occurrences
 
 
-@pytest.mark.parametrize(  # noqa: PT006
-    "input_data,element,expected",
+@pytest.mark.parametrize(
+    ("input_data", "element", "expected"),
     [
         ({"key1": "OK", "key2": "NOT OK"}, "OK", 1),
         ({"key1": ["OK"], "key2": ["NOT OK"]}, "OK", 1),
@@ -18,8 +18,8 @@ def test_find_occurrences__search_string(input_data, element, expected):
     assert expected == find_occurrences(input_data, element)
 
 
-@pytest.mark.parametrize(  # noqa: PT006
-    "input_data,element,expected",
+@pytest.mark.parametrize(
+    ("input_data", "element", "expected"),
     [
         ({"key1": ["OK"], "key2": ["NOT OK"]}, ["OK"], 1),
         ({"key1": ("OK",), "key2": ("NOT OK", "OK")}, ("OK",), 1),
@@ -36,8 +36,8 @@ def test_find_occurrences__search__list__tuple__set(input_data, element, expecte
     assert expected == find_occurrences(input_data, element)
 
 
-@pytest.mark.parametrize(  # noqa: PT006
-    "input_data,element,expected",
+@pytest.mark.parametrize(
+    ("input_data", "element", "expected"),
     [
         ({"key1": ["OK"]}, {"key1": ["OK"]}, 1),
         ({"key1": ["OK", {"key1": "OK"}], "key2": ["NOT OK"]}, {"key1": "OK"}, 1),
@@ -47,8 +47,8 @@ def test_find_occurrences__search__dict(input_data, element, expected):
     assert expected == find_occurrences(input_data, element)
 
 
-@pytest.mark.parametrize(  # noqa: PT006
-    "input_data,element,expected",
+@pytest.mark.parametrize(
+    ("input_data", "element", "expected"),
     [
         ({"key1": 1, "key2": True}, 1, 1),
         ({"key1": [1], "key2": ["NOT OK", 1]}, 1, 2),
@@ -59,8 +59,8 @@ def test_find_occurrences__search_int(input_data, element, expected):
     assert expected == find_occurrences(input_data, element)
 
 
-@pytest.mark.parametrize(  # noqa: PT006
-    "input_data,element,expected",
+@pytest.mark.parametrize(
+    ("input_data", "element", "expected"),
     [
         ({"key1": 1, "key2": True}, True, 1),
         ({"key1": [True], "key2": ["NOT OK", False]}, True, 1),
