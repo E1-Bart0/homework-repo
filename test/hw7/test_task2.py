@@ -8,7 +8,7 @@ from All_home_works.hw7.task2 import backspace_compare
     [
         ("aB#c", "aD#c"),
         ("A##c", "#A#c"),
-        ("#", "", True),
+        ("#", ""),
         ("abcABCD####", "abc"),
     ],
 )
