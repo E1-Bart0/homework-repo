@@ -6,7 +6,6 @@ from All_home_works.hw9.task2 import Suppressor
 def test_class_suppressor__catch_expected_exception():
     with Suppressor(IndexError):
         [][2]
-    assert True
 
 
 def test_class_suppressor__catch_not_expected_exception():
@@ -18,7 +17,6 @@ def test_class_suppressor__catch_not_expected_exception():
 def test_generator_suppressor__catch_expected_exception():
     with Suppressor(IndexError):
         [][2]
-    assert True
 
 
 def test_generator_suppressor__catch_not_expected_exception():
