@@ -50,15 +50,17 @@ class KeyValueStorage:
         return data
 
     def __getitem__(self, item):
-        return self._get_value_if_exists(item)
-
-    def __getattr__(self, attr):
-        return self._get_value_if_exists(attr)
-
-    def _get_value_if_exists(self, item):
         value = self.data.get(item, None)
         if value is None:
-            raise ValueError(
-                f"'{KeyValueStorage.__name__}' object has no attribute '{item}'"
+            raise KeyError(
+                f"'{KeyValueStorage.__name__}' object has no such key: '{item}'"
+            )
+        return value
+
+    def __getattr__(self, attr):
+        value = self.data.get(attr, None)
+        if value is None:
+            raise AttributeError(
+                f"'{KeyValueStorage.__name__}' object has no such attribute: '{attr}'"
             )
         return value

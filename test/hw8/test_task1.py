@@ -32,9 +32,9 @@ def test_key_value_storage__has_attributes_as_item(file_name):
 
 def test_key_value_storage__not_existing_attributes(file_name):
     storage = KeyValueStorage(file_name)
-    with pytest.raises(ValueError, match="object has no attribute"):
+    with pytest.raises(AttributeError, match="object has no such attribute:"):
         _ = storage.not_existing
-    with pytest.raises(ValueError, match="object has no attribute"):
+    with pytest.raises(KeyError, match="object has no such key:"):
         _ = storage["not_existing"]
 
 
