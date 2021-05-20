@@ -16,24 +16,27 @@ from typing import Iterator, List, Union
 
 
 def merge_sorted_files(file_list: List[Union[Path, str]]) -> Iterator:
-    num_generators = [_get_nums_from_file(file) for file in file_list]
-    numbers = [
-        (index, next(number, float("inf")))
-        for index, number in enumerate(num_generators)
-    ]
-    stop = sum(num[1] == float("inf") for num in numbers)
-    while stop < len(numbers):
-        num, stop = _get_min_number(numbers, num_generators, stop)
-        yield num
+    numbers__generators = _get_numbers_and_generators(file_list)
+
+    while numbers__generators:
+        num__gen = min(numbers__generators, key=lambda x: x[0])
+        yield num__gen[0]
+
+        next_number = next(num__gen[1], None)
+        if next_number is None:
+            numbers__generators.remove(num__gen)
+            continue
+        num__gen[0] = next_number
 
 
-def _get_min_number(numbers, num_generators, stop):
-    index, num = min(numbers, key=lambda x: x[1])
-    next_number = next(num_generators[index], float("inf"))
-    numbers[index] = (index, next_number)
-    if next_number == float("inf"):
-        stop += 1
-    return num, stop
+def _get_numbers_and_generators(file_list):
+    numbers__generators = []
+    for file in file_list:
+        generator = _get_nums_from_file(file)
+        first_num = next(generator, None)
+        if first_num is not None:
+            numbers__generators.append([first_num, generator])
+    return numbers__generators
 
 
 def _get_nums_from_file(filename):
