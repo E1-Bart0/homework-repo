@@ -13,18 +13,24 @@ Examples:
     Output: False
     Explanation: s becomes "c" while t becomes "b".
 """
+from itertools import zip_longest
 
 
 def backspace_compare(first: str, second: str) -> bool:
-    return get_filtered(first) == get_filtered(second)
+    first_gen = get_filtered(first)
+    second_gen = get_filtered(second)
+    return all(
+        char1 == char2
+        for char1, char2 in zip_longest(first_gen, second_gen, fillvalue=False)
+    )
 
 
 def get_filtered(string):  # noqa: CCR001
-    result = []
-    for char in string:
+    counter = 0
+    for char in reversed(string):
         if char == "#":
-            if result:
-                result.pop()
-            continue
-        result.append(char)
-    return result
+            counter += 1
+        elif char != "#" and counter:
+            counter -= 1
+        else:
+            yield char
