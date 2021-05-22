@@ -10,37 +10,22 @@ class ColorsEnum(metaclass=SimplifiedEnum):
     BLACK = "BLACK"
 
 
-class SizesEnum(metaclass=SimplifiedEnum):
-    XL = "XL"
-    L = "L"
-    M = "M"
-    S = "S"
-    XS = "XS"
-
-
 @pytest.mark.parametrize(
-    ("cls", "attr"),
+    "attr",
     [
-        (ColorsEnum, "RED"),
-        (ColorsEnum, "BLACK"),
-        (SizesEnum, "XL"),
-        (SizesEnum, "S"),
+        "RED",
+        "BLACK",
+        "BLUE",
+        "ORANGE",
     ],
 )
-def test_simplified_enum_metaclass_works_fine_for_class(cls, attr):
-    assert getattr(cls, attr) == attr
+def test_simplified_enum_metaclass_works_fine_for_class(attr):
+    assert getattr(ColorsEnum, attr) == attr
 
 
-@pytest.mark.parametrize(
-    ("cls", "attr"),
-    [
-        (ColorsEnum, "O"),
-        (SizesEnum, "O"),
-    ],
-)
-def test_simplified_enum_metaclass__if_attr_does_not_exist(cls, attr):
+def test_simplified_enum_metaclass__if_attr_does_not_exist():
     with pytest.raises(AttributeError, match="Does not exist:"):
-        getattr(cls, attr)
+        _ = ColorsEnum.O
 
 
 def test_simplified_enum_metaclass__if_class_instance_is_ok():
@@ -88,7 +73,7 @@ def test_simplified_enum_metaclass__if_class_instance_overwrite_attrs():
     assert test.B == "B"
 
 
-def test_simplified_enum_metaclass__overwrite__getattr_for_instance():
+def test_simplified_enum_metaclass_overwrite_getattr_for_instance():
     class Test(metaclass=SimplifiedEnum):
         A = "A"
 
