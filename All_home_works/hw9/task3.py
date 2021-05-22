@@ -23,14 +23,18 @@ def universal_file_counter(
 
 
 def count_lines_in_file(file_path, tokenizer):
-    counter = 0
-    line = ""
     with open(file_path) as file:
-        for line in file:
-            line = line
-            counter += 1 if tokenizer is None else len(tokenizer(line))
-        counter += 1 if line.endswith("\n") and tokenizer is None else 0
-        return counter
+        if tokenizer is None:
+            return count_lines(file)
+        return len(tokenizer(file.read()))
+
+
+def count_lines(file):
+    counter = 0
+    for line in file:  # noqa: B007
+        counter += 1
+    counter += 1 if counter and line.endswith("\n") else 0
+    return counter
 
 
 def get_files_from_directory(dir_path, file_extension):  # noqa: CCR001

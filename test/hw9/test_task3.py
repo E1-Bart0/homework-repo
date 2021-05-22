@@ -14,12 +14,12 @@ def make_dir():
         nonlocal directory, files
         directory = tempfile.TemporaryDirectory()
         for extension in (".py", ".txt", ".txt"):
-            file = tempfile.NamedTemporaryFile(
+            named_file = tempfile.NamedTemporaryFile(
                 dir=directory.name, suffix=extension, mode="w"
             )
-            file.writelines(data)
-            file.seek(0)
-            files.append(file)
+            named_file.writelines(data)
+            named_file.seek(0)
+            files.append(named_file)
         return directory.name
 
     yield _dirname
