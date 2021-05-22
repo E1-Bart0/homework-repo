@@ -21,7 +21,7 @@ def backspace_compare(first: str, second: str) -> bool:
     second_gen = get_filtered(second)
     return all(
         char1 == char2
-        for char1, char2 in zip_longest(first_gen, second_gen, fillvalue=False)
+        for char1, char2 in zip_longest(first_gen, second_gen, fillvalue="")
     )
 
 
