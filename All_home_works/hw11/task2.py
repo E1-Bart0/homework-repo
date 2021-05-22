@@ -36,15 +36,7 @@ def elder_discount(order):
 class Order:
     def __init__(self, price, strategy):
         self.price = price
-        self._strategy = strategy
-
-    @property
-    def strategy(self):
-        return self._strategy
-
-    @strategy.setter
-    def strategy(self, strategy):
-        self._strategy = strategy
+        self._discount_program = strategy
 
     def final_price(self):
-        return self._strategy(self)
+        return self._discount_program(self)
