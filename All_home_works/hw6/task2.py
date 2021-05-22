@@ -65,7 +65,9 @@ class HomeworkResult:
     @staticmethod
     def check_if_homework_obj(homework):
         if not isinstance(homework, Homework):
-            raise InstanceNotHomeworkError(homework)
+            raise InstanceNotHomeworkError(
+                "You gave a not Homework object, Got", type(homework)
+            )
 
     def __str__(self):
         return (
@@ -110,9 +112,7 @@ class Teacher(Human):
 
 
 class InstanceNotHomeworkError(TypeError):
-    def __init__(self, homework):
-        self.messages = f"You gave a not Homework object, Got {type(homework)}"
-        super().__init__(self.messages)
+    pass
 
 
 class DeadlineError(ValueError):
