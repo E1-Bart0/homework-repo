@@ -13,3 +13,8 @@ Utilizing that framework capabilities, create
 
 
 Utilize ORM capabilities as much as possible, avoiding executing raw SQL queries.
+
+# ======================
+# To apply migrations:
+# $ cd  All_home_works/hw12/
+# $ alembic upgrade head

@@ -13,9 +13,6 @@ class Human(Base):
     first_name = Column(String(30))
     last_name = Column(String(30))
 
-    def __repr__(self):
-        return f"<{self.__tablename__}({self.first_name=}, {self.last_nam=}>"
-
 
 class Student(Human):
     __tablename__ = "student"

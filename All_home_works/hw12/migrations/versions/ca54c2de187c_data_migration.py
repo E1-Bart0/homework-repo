@@ -21,16 +21,16 @@ depends_on = None
 
 def upgrade():
     session_class = sessionmaker(bind=engine)
-
     session = session_class()
+
     user = Student(id=1, first_name="Jon", last_name="Doe")
     teacher = Teacher(id=1, first_name="Jane", last_name="Doe")
     homework1 = Homework(id=1, text="First", deadline=2)
     homework_result = HomeworkResult(
         id=1, solution="SOLUTION", author=user, homework=homework1, teacher_id=1
     )
-
     session.add_all([user, teacher, homework1, homework_result])
+
     session.commit()
     session.close()
 
