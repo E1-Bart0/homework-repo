@@ -7,11 +7,11 @@ Create Date: 2021-05-23 00:14:54.679469
 
 """
 
-from core.db import engine
-
 # revision identifiers, used by Alembic.
 from sqlalchemy.orm import sessionmaker
-from task_models import Homework, HomeworkResult, Student, Teacher
+
+from All_home_works.hw12.core.db import engine
+from All_home_works.hw12.task_models import Homework, HomeworkResult, Student, Teacher
 
 revision = "ca54c2de187c"
 down_revision = "b5802f793e9d"
