@@ -6,8 +6,7 @@ import sqlite3
 
 class TableData:
     def __init__(self, db_name, db_table):
-        self._conn = sqlite3.connect(db_name)
-        self._conn.row_factory = sqlite3.Row
+        self._db_name = db_name
         self._db_table = db_table
 
     def check_if_table_in_db(self):
@@ -19,6 +18,8 @@ class TableData:
             raise sqlite3.OperationalError(f"no such table: {self._db_table}")
 
     def __enter__(self):
+        self._conn = sqlite3.connect(self._db_name)
+        self._conn.row_factory = sqlite3.Row
         self.cursor = self._conn.cursor()
         self.check_if_table_in_db()
         return self
@@ -39,7 +40,9 @@ class TableData:
             f"SELECT * FROM '{self._db_table}' where name=?;", (item,)  # noqa: S608
         )
         data = self.cursor.fetchone()
-        return dict(zip(data.keys(), data)) if data is not None else None
+        if data is None:
+            raise KeyError(item)
+        return dict(zip(data.keys(), data))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self._conn:
