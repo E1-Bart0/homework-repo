@@ -56,7 +56,7 @@ def test_simplified_enum_metaclass_is_ok__if_class_instance_overwrite__keys():
     test = Test(0)
     assert Test.A == "A"
     assert test.A == "A"
-    assert test.__class__.__dict__ == 0
+    assert test._Test__keys == 0
 
 
 def test_simplified_enum_metaclass__if_class_instance_overwrite_attrs():
