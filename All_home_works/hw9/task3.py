@@ -18,15 +18,16 @@ def universal_file_counter(
 ) -> int:
     counter = 0
     for file_path in get_files_from_directory(dir_path, file_extension):
-        counter += count_lines_in_file(file_path, tokenizer)
+        with open(file_path) as file:
+            if tokenizer is None:
+                counter += count_lines(file)
+            else:
+                counter += count_tokens(file, tokenizer)
     return counter
 
 
-def count_lines_in_file(file_path, tokenizer):
-    with open(file_path) as file:
-        if tokenizer is None:
-            return count_lines(file)
-        return len(tokenizer(file.read()))
+def count_tokens(file, tokenizer):
+    return len(tokenizer(file.read()))
 
 
 def count_lines(file):
