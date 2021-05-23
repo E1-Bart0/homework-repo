@@ -18,13 +18,12 @@ def _create_db_table():
 
 
 @pytest.fixture()
-@pytest.mark.usefixtures(_create_db_table)
-def updated_db():
+def updated_db(_create_db_table):
     with TableData("file::memory:?cache=shared", "test") as storage:
         conn = sqlite3.connect("file::memory:?cache=shared")
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO 'test' (name, author) VALUES ('Test Book', 'Test Author')"
+            "INSERT INTO test (name, author) VALUES ('Test Book', 'Test Author')"
         )
         conn.commit()
         yield storage
@@ -33,14 +32,14 @@ def updated_db():
         conn.close()
 
 
-@pytest.mark.usefixtures(_create_db_table)
+@pytest.mark.usefixtures("_create_db_table")
 def test_table_data__not_such_table():
     with pytest.raises(sqlite3.OperationalError, match="no such table:"):  # noqa: PT012
         with TableData("file::memory:?cache=shared", "NOT EXSISTS"):
             ...
 
 
-@pytest.mark.usefixtures(_create_db_table)
+@pytest.mark.usefixtures("_create_db_table")
 def test_table_data__if_len_correct():
     with TableData("file::memory:?cache=shared", "test") as storage:
         assert 2 == len(storage)
@@ -51,7 +50,7 @@ def test_table_data__if_len_correct__after_update_storage(updated_db):
     assert 3 == len(storage)
 
 
-@pytest.mark.usefixtures(_create_db_table)
+@pytest.mark.usefixtures("_create_db_table")
 def test_table_data__get_row_from_db_by_name_but_there_is_not_such_record():
     with TableData("file::memory:?cache=shared", "test") as storage:
         assert {"name": "Book1", "author": "John Doe"} == storage["Book1"]
@@ -64,7 +63,7 @@ def test_table_data__get_row_from_db_by_name__check_storage_after_update(updated
     assert {"name": "Test Book", "author": "Test Author"} == storage["Test Book"]
 
 
-@pytest.mark.usefixtures(_create_db_table)
+@pytest.mark.usefixtures("_create_db_table")
 def test_table_data__for_loop():
     with TableData("file::memory:?cache=shared", "test") as storage:
         iter_storage = iter(storage)
@@ -78,7 +77,7 @@ def test_table_data__for_loop():
             next(iter_storage)
 
 
-@pytest.mark.usefixtures(_create_db_table)
+@pytest.mark.usefixtures("_create_db_table")
 def test_table_data__for_loop_but_there_is_no_records():
     conn = sqlite3.connect("file::memory:?cache=shared")
     cursor = conn.cursor()
@@ -91,14 +90,14 @@ def test_table_data__for_loop_but_there_is_no_records():
             next(iter_storage)
 
 
-@pytest.mark.usefixtures(_create_db_table)
+@pytest.mark.usefixtures("_create_db_table")
 def test_table_data__if_something_in_storage():
     with TableData("file::memory:?cache=shared", "test") as storage:
         assert "Book1" in storage
         assert "Jain Doe" in storage
 
 
-@pytest.mark.usefixtures(_create_db_table)
+@pytest.mark.usefixtures("_create_db_table")
 def test_table_data__if_something_in_storage__but_something_not_exists_in_storage():
     with TableData("file::memory:?cache=shared", "test") as storage:
         assert "Book3" not in storage
