@@ -4,9 +4,8 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-# sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # noqa: E800
-sys.path = ["", ".."] + sys.path[1:]
-from core.base import Base  # noqa: E402
+sys.path = ["", "../.."] + sys.path[1:]
+from All_home_works.hw12.core.db import Base  # noqa: E402
 
 URL = "sqlite:///main.db"
 
