@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from core.db import Base
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
+
+from All_home_works.hw12.core.db import Base
 
 
 class Human(Base):
