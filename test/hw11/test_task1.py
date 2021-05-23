@@ -25,7 +25,7 @@ def test_simplified_enum_metaclass_works_fine_for_class(attr):
 
 def test_simplified_enum_metaclass__if_attr_does_not_exist():
     with pytest.raises(AttributeError, match="Does not exist:"):
-        _ = ColorsEnum.O
+        ColorsEnum.O
 
 
 def test_simplified_enum_metaclass__if_class_instance_is_ok():
@@ -56,7 +56,7 @@ def test_simplified_enum_metaclass_is_ok__if_class_instance_overwrite__keys():
     test = Test(0)
     assert Test.A == "A"
     assert test.A == "A"
-    assert test._Test__keys == 0
+    assert test.__class__.__dict__ == 0
 
 
 def test_simplified_enum_metaclass__if_class_instance_overwrite_attrs():
@@ -83,7 +83,7 @@ def test_simplified_enum_metaclass_overwrite_getattr_for_instance():
     test = Test()
     assert Test.A == "A"
     with pytest.raises(AttributeError, match="Does not exist:"):
-        _ = Test.NOT_EXISTS
+        Test.NOT_EXISTS
     assert test.A == "A"
     with pytest.raises(AttributeError, match="Does not exist:"):
-        _ = test.NOT_EXISTS
+        test.NOT_EXISTS
