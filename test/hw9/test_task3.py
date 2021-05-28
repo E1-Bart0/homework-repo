@@ -60,7 +60,7 @@ def test_universal_file_counter__without_tokenizer_file_ends_with_empty_line(mak
 
 def test_universal_file_counter__with_tokenizer(make_dir):
     expected = 4
-    data = ["one line\n", "second line\n"]
+    data = ["first: second:\n", "third: fourth:\n"]
     dirname = make_dir(data, (".py",))
     res = universal_file_counter(dirname, "py", str.split)
     assert res == expected
