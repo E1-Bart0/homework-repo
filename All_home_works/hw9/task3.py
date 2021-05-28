@@ -19,10 +19,11 @@ def universal_file_counter(
     counter = 0
     for file_path in get_files_from_directory(dir_path, file_extension):
         with open(file_path) as file:
-            if tokenizer is None:
-                counter += count_lines(file)
-            else:
-                counter += count_tokens(file, tokenizer)
+            counter += (
+                count_lines(file)
+                if tokenizer is None
+                else count_tokens(file, tokenizer)
+            )
     return counter
 
 
@@ -41,5 +42,5 @@ def count_lines(file):
 def get_files_from_directory(dir_path, file_extension):  # noqa: CCR001
     for dirpath, _, filenames in os.walk(dir_path):
         for file in filenames:
-            if file.split(".")[-1] == file_extension:
+            if file.endswith(f".{file_extension}"):
                 yield os.path.join(dirpath, file)
