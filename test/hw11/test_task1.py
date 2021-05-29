@@ -6,17 +6,13 @@ from All_home_works.hw11.task1 import SimplifiedEnum
 class ColorsEnum(metaclass=SimplifiedEnum):
     RED = "RED"
     BLUE = "BLUE"
-    ORANGE = "ORANGE"
-    BLACK = "BLACK"
 
 
 @pytest.mark.parametrize(
     "attr",
     [
         "RED",
-        "BLACK",
         "BLUE",
-        "ORANGE",
     ],
 )
 def test_simplified_enum_metaclass_works_fine_for_class(attr):
