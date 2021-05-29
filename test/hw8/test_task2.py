@@ -94,7 +94,7 @@ def test_table_data__for_loop_but_there_is_no_records():
 def test_table_data__if_something_in_storage():
     with TableData("file::memory:?cache=shared", "test") as storage:
         assert "Book1" in storage
-        assert "Jain Doe" in storage
+        assert "Book2" in storage
 
 
 @pytest.mark.usefixtures("_create_db_table")

@@ -26,23 +26,32 @@ class TableData:
 
     def __iter__(self):
         self.cursor.execute(f"SELECT * FROM '{self._db_table}';")  # noqa: S608
-        return (dict(zip(data.keys(), data)) for data in self.cursor.fetchall())
+        return self
+
+    def __next__(self):
+        data = self.cursor.fetchone()
+        if data is None:
+            raise StopIteration
+        return dict(zip(data.keys(), data))
 
     def __contains__(self, item):
-        return any(item in dict_obj.values() for dict_obj in self)
+        return self._find_row_with_name(item)
 
     def __len__(self):
         self.cursor.execute(f"SELECT count(*) FROM '{self._db_table}';")  # noqa: S608
         return self.cursor.fetchone()[0]
 
     def __getitem__(self, item):
-        self.cursor.execute(
-            f"SELECT * FROM '{self._db_table}' where name=?;", (item,)  # noqa: S608
-        )
-        data = self.cursor.fetchone()
+        data = self._find_row_with_name(item)
         if data is None:
             raise KeyError(item)
         return dict(zip(data.keys(), data))
+
+    def _find_row_with_name(self, item):
+        self.cursor.execute(
+            f"SELECT * FROM '{self._db_table}' where name=?;", (item,)  # noqa: S608
+        )
+        return self.cursor.fetchone()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self._conn:
