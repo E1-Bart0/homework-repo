@@ -12,18 +12,17 @@ import os
 from pathlib import Path
 from typing import Callable, Optional
 
+from _pytest import pathlib
+
 
 def universal_file_counter(
     dir_path: Path, file_extension: str, tokenizer: Optional[Callable] = None
 ) -> int:
     counter = 0
+    count_function = count_lines if tokenizer is None else count_tokens
     for file_path in get_files_from_directory(dir_path, file_extension):
         with open(file_path) as file:
-            counter += (
-                count_lines(file)
-                if tokenizer is None
-                else count_tokens(file, tokenizer)
-            )
+            counter += count_function(file, tokenizer)
     return counter
 
 
@@ -31,7 +30,7 @@ def count_tokens(file, tokenizer):
     return len(tokenizer(file.read()))
 
 
-def count_lines(file):
+def count_lines(file, *args, **kwargs):
     counter = 0
     for line in file:  # noqa: B007
         counter += 1
@@ -42,5 +41,5 @@ def count_lines(file):
 def get_files_from_directory(dir_path, file_extension):  # noqa: CCR001
     for dirpath, _, filenames in os.walk(dir_path):
         for file in filenames:
-            if file.endswith(f".{file_extension}"):
+            if pathlib.Path(file).suffix == f".{file_extension}":
                 yield os.path.join(dirpath, file)
