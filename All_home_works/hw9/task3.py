@@ -30,7 +30,7 @@ def count_tokens(file, tokenizer):
     return len(tokenizer(file.read()))
 
 
-def count_lines(file, *args, **kwargs):
+def count_lines(file, tokenizer):
     counter = 0
     for line in file:  # noqa: B007
         counter += 1
