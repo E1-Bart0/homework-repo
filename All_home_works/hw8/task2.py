@@ -35,7 +35,7 @@ class TableData:
         return dict(zip(data.keys(), data))
 
     def __contains__(self, item):
-        return self._find_row_with_name(item)
+        return bool(self._find_row_with_name(item))
 
     def __len__(self):
         self.cursor.execute(f"SELECT count(*) FROM '{self._db_table}';")  # noqa: S608
