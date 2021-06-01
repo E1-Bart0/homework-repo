@@ -26,13 +26,11 @@ class TableData:
 
     def __iter__(self):
         self.cursor.execute(f"SELECT * FROM '{self._db_table}';")  # noqa: S608
-        return self
+        return self.get_rows_from_cursor()
 
-    def __next__(self):
-        data = self.cursor.fetchone()
-        if data is None:
-            raise StopIteration
-        return dict(zip(data.keys(), data))
+    def get_rows_from_cursor(self):
+        while data := self.cursor.fetchone():
+            yield dict(zip(data.keys(), data))
 
     def __contains__(self, item):
         return bool(self._find_row_with_name(item))

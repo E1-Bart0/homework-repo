@@ -55,7 +55,7 @@ def test_table_data__get_row_from_db_by_name_but_there_is_not_such_record():
     with TableData("file::memory:?cache=shared", "test") as storage:
         assert {"name": "Book1", "author": "John Doe"} == storage["Book1"]
         with pytest.raises(KeyError):
-            _ = storage["Book3"]
+            storage["Book3"]
 
 
 def test_table_data__get_row_from_db_by_name__check_storage_after_update(updated_db):
@@ -67,12 +67,8 @@ def test_table_data__get_row_from_db_by_name__check_storage_after_update(updated
 def test_table_data__for_loop():
     with TableData("file::memory:?cache=shared", "test") as storage:
         iter_storage = iter(storage)
-        row = next(iter_storage)
-        assert row["name"] == "Book1"
-        assert row["author"] == "John Doe"
-        row = next(iter_storage)
-        assert row["name"] == "Book2"
-        assert row["author"] == "Jain Doe"
+        assert {"name": "Book1", "author": "John Doe"} == next(iter_storage)
+        assert {"name": "Book2", "author": "Jain Doe"} == next(iter_storage)
         with pytest.raises(StopIteration):
             next(iter_storage)
 
