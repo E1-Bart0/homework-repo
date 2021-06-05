@@ -5,13 +5,15 @@ from aiohttp import InvalidURL
 from bs4 import BeautifulSoup
 
 from All_home_works.hw10.task1_get_result import (
-    _find_values_for_company,
-    _get_additional_info_about_company,
-    _get_result_from,
+    collect_data,
+    collect_html_for_companies,
     fetch_response,
+    find_p_e_ratio_and_profit,
+    get_company_as_a_dict,
     get_company_url_from_main_table,
     get_current_course,
-    get_full_info_about_company,
+    get_float,
+    get_result,
 )
 
 
@@ -44,17 +46,6 @@ async def test_fetch_response__works(get):
 @pytest.mark.asyncio()
 @patch(
     "All_home_works.hw10.task1_get_result.aiohttp.ClientSession.get",
-    return_value=MockResponse(status=404, text="<div>"),
-)
-async def test_fetch_response__status_not_200(get):
-    url = "Fake URL"
-    with pytest.raises(ValueError, match="Response should be 200, got:"):
-        await fetch_response(url)
-
-
-@pytest.mark.asyncio()
-@patch(
-    "All_home_works.hw10.task1_get_result.aiohttp.ClientSession.get",
     side_effect=InvalidURL("Fake URL"),
 )
 async def test_fetch_response__bad_url(get):
@@ -64,30 +55,59 @@ async def test_fetch_response__bad_url(get):
 
 
 @pytest.mark.asyncio()
-@patch("All_home_works.hw10.task1_get_result.time")
 @patch(
     "All_home_works.hw10.task1_get_result.aiohttp.ClientSession.get",
     return_value=MockResponse(
         status=200, text='<Valute ID="R01235"><Value>74,1373</Value>=</Valute>'
     ),
 )
-async def test_get_current_course__parse_current_course__returns_correct_value(
-    get, time
-):
-    time.strftime.return_value = "NOW"
-    url = "http://www.cbr.ru/scripts/XML_daily.asp?date_req=NOW"
+async def test_get_current_course__parse_current_course(get):
+    url = "http://www.cbr.ru/scripts/XML_daily.asp"
     result = await get_current_course()
     get.assert_called_once_with(url)
     assert result == 74.1373
 
 
 @pytest.mark.asyncio()
+@patch("All_home_works.hw10.task1_get_result.URL", "url")
+@patch("All_home_works.hw10.task1_get_result.COURSE", 1)
+@patch("All_home_works.hw10.task1_get_result.fetch_response", return_value="response")
+@patch("All_home_works.hw10.task1_get_result.get_current_course", return_value=2.0)
 @patch(
-    "All_home_works.hw10.task1_get_result._find_values_for_company",
-    return_value=iter([1.11, 2.00, 3.00]),
+    "All_home_works.hw10.task1_get_result.collect_html_for_companies",
+    return_value="html",
 )
-async def test_get_additional_info_about_company_returns_correct_value(  # noqa: PT019
-    _find_values_for_company,
+@patch(
+    "All_home_works.hw10.task1_get_result.get_company_url_from_main_table",
+    return_value=iter([("/company/1", 10.0), ("company/2", -10.0)]),
+)
+async def test_collect_data(get_companies_url, collect_html, get_course, get_response):
+    result = await collect_data()
+    get_response.assert_called_once_with("url")
+    get_course.assert_called_once()
+    get_companies_url.assert_called_once_with(get_response.return_value)
+    calls = collect_html.call_args_list
+    assert [call(("/company/1", 10.0)), call(("company/2", -10.0))] == calls
+    assert result == ["html", "html"]
+
+
+@pytest.mark.asyncio()
+@patch("All_home_works.hw10.task1_get_result.fetch_response", return_value="text")
+@patch("All_home_works.hw10.task1_get_result.MAIN_URL", "url/")
+async def test_collect_html_for_companies(get_response):
+    data = ("company/1", 10.0)
+    result = await collect_html_for_companies(data)
+    get_response.assert_called_once_with("url/company/1")
+    assert result == ("text", 10.0)
+
+
+@patch("All_home_works.hw10.task1_get_result.COURSE", 1)
+@patch(
+    "All_home_works.hw10.task1_get_result.find_p_e_ratio_and_profit",
+    return_value=[1.11, 50.0],
+)
+def test_get_company_as_a_dict(
+    mock_find,
 ):
     request = (
         '<div class="price-section__row">'
@@ -96,9 +116,8 @@ async def test_get_additional_info_about_company_returns_correct_value(  # noqa:
         "<span>203.20</span>"
         "</div>"
     )
-    annual_growth = "-10%"
-    course = 1
-    result = await _get_additional_info_about_company(request, annual_growth, course)
+    annual_growth = -10.0
+    result = get_company_as_a_dict(request, annual_growth)
     expected = {
         "code": "MMM",
         "name": "3M Co.",
@@ -108,79 +127,60 @@ async def test_get_additional_info_about_company_returns_correct_value(  # noqa:
         "potential profit": 50.0,
     }
     assert expected == result
+    mock_find.assert_called_once()
 
 
-@pytest.mark.asyncio()
-async def test_find_values_for_company_returns_correct_value():
+def test_find_p_e_ratio_and_profit_is_ok():
     request = (
         '<div class="snapshot">'
-        "<div>131.12"
+        "<div>100"
         "<div>52 Week Low</div>"
         "</div>"
-        "<div>203.87<div>52 Week High</div>"
+        "<div>200.0<div>52 Week High</div>"
         "</div>"
         "<div>19.9<div>P/E Ratio</div>"
         "</div>"
         "</div>"
     )
     soup = BeautifulSoup(request, features="html.parser")
-    result = _find_values_for_company(soup)
-    expected = [19.9, 131.12, 203.87]
-    assert expected == list(result)
+    profit = 100.0
+    result = find_p_e_ratio_and_profit(soup)
+    expected = (19.9, profit)
+    assert expected == result
 
 
-@pytest.mark.asyncio()
-async def test_find_values_for_company_returns_correct_value_if_coma_in_value():
+def test_find_p_e_ratio_and_profit__if_coma_in_value():
     request = (
         '<div class="snapshot">'
-        "<div>1,000.12"
+        "<div>1,000.00"
         "<div>52 Week Low</div>"
         "</div>"
-        "<div>2,000.87<div>52 Week High</div>"
+        "<div>2,000.00<div>52 Week High</div>"
         "</div>"
         "<div>1,900.1<div>P/E Ratio</div>"
         "</div>"
         "</div>"
     )
     soup = BeautifulSoup(request, features="html.parser")
-    result = _find_values_for_company(soup)
-    expected = [1900.1, 1000.12, 2000.87]
-    assert expected == list(result)
+    result = find_p_e_ratio_and_profit(soup)
+    assert (1900.1, 100) == result
 
 
-@pytest.mark.asyncio()
-async def test_find_values_for_company_returns_correct_value_if_something_is_none():
+def test_find_p_e_ratio_and_profit__if_week_low_and_week_high_is_none():
+    request = '<div class="snapshot">' "<div>10.0<div>P/E Ratio</div>" "</div>" "</div>"
+    soup = BeautifulSoup(request, features="html.parser")
+    result = find_p_e_ratio_and_profit(soup)
+    assert (10.0, None) == result
+
+
+def test_find_p_e_ratio_and_profit__if_all_is_none():
     request = '<div class="snapshot">' "</div>"
     soup = BeautifulSoup(request, features="html.parser")
-    result = _find_values_for_company(soup)
-    expected = [None, None, None]
-    assert expected == list(result)
+    result = find_p_e_ratio_and_profit(soup)
+    assert (None, None) == result
 
 
-@pytest.mark.asyncio()
-@patch("All_home_works.hw10.task1_get_result.fetch_response", return_value="response")
-@patch(
-    "All_home_works.hw10.task1_get_result._get_additional_info_about_company",
-    return_value="additional_info",
-)
-async def test_get_full_info_about_company_returns_correct_value(
-    get_additional_info_about_company, fetch_response
-):
-    url = "test//main.test/add/info"
-    company_url = "/company/1"
-    annual_growth = "-10%"
-    course = 1
-    result = await get_full_info_about_company(url, company_url, annual_growth, 1)
-
-    fetch_response.assert_called_once_with("test//main.test/company/1")
-    get_additional_info_about_company.assert_called_once_with(
-        "response", annual_growth, course
-    )
-    assert result == "additional_info"
-
-
-@pytest.mark.asyncio()
-async def test_get_company_url_from_main_table():
+def test_get_company_url_from_main_table():
     response = (
         "<tr>"
         "<td><h1>NAME</h1></td>"
@@ -193,26 +193,36 @@ async def test_get_company_url_from_main_table():
         "</tr>"
     )
     result = get_company_url_from_main_table(response)
-    assert [("/company/test", "1%")] == list(result)
+    assert [("/company/test", 1.0)] == list(result)
 
 
-@pytest.mark.asyncio()
+@pytest.mark.parametrize(
+    ("string", "expect"),
+    [
+        ("-11%", -11.0),
+        ("10.0%", 10.0),
+        ("1,000.00", 1000.0),
+        ("-1,000.00", -1000.0),
+    ],
+)
+def test_get_float(string, expect):
+    assert expect == get_float(string)
+
+
 @patch(
-    "All_home_works.hw10.task1_get_result.get_company_url_from_main_table",
-    return_value=iter([("/company/1", "10%"), ("company/2", "-10%")]),
+    "All_home_works.hw10.task1_get_result.collect_data",
+    return_value=[("html1", 1.0), ("html2", 2.0)],
 )
 @patch(
-    "All_home_works.hw10.task1_get_result.get_full_info_about_company",
-    return_value={"result": "OK"},
+    "All_home_works.hw10.task1_get_result.get_company_as_a_dict",
+    return_value={"company": "ok"},
 )
-async def test_get_result_from(get_info_about_company, get_company_url_from_main_table):
-    url = "test/url"
-    response = "test/response"
-    course = 1
-    res = await _get_result_from(url, response, course)
-    get_company_url_from_main_table.assert_called_once_with(response)
-    assert get_info_about_company.call_args_list == [
-        call("test/url", "/company/1", "10%", 1),
-        call("test/url", "company/2", "-10%", 1),
-    ]
-    assert res == [{"result": "OK"}, {"result": "OK"}]
+@patch(
+    "multiprocessing.pool.Pool.starmap",
+    side_effect=lambda func, data: [func(d) for d in data],
+)
+def test_get_result_is_ok(pool, get_dict, collect):
+    result = get_result()
+    collect.assert_called_once()
+    assert get_dict.call_args_list == [call(("html1", 1.0)), call(("html2", 2.0))]
+    assert result == [{"company": "ok"}, {"company": "ok"}]

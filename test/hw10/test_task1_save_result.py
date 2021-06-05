@@ -1,4 +1,4 @@
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, call, patch
 
 import pytest
 
@@ -13,23 +13,45 @@ from All_home_works.hw10.task1_save_result import (
 
 
 @pytest.mark.asyncio()
-@patch("All_home_works.hw10.task1_save_result.get_result", return_value=[])
+@patch(
+    "All_home_works.hw10.task1_save_result.get_result", return_value=[{"company": 1}]
+)
 @patch("All_home_works.hw10.task1_save_result.save_to_file")
-async def test_save(save_to_file, get_result, monkeypatch):
-    monkeypatch.setattr(
-        "multiprocessing.pool.Pool.map", lambda *args: save_to_file(args[2])
-    )
-    await save()
-    assert save_to_file.assert_called_once
+@patch("All_home_works.hw10.task1_save_result.top_most_expensive_companies")
+@patch("All_home_works.hw10.task1_save_result.top_fewest_pe_rating_companies")
+@patch("All_home_works.hw10.task1_save_result.top_most_growth_companies")
+@patch("All_home_works.hw10.task1_save_result.top_most_profit_companies")
+@patch(
+    "multiprocessing.pool.Pool.starmap",
+    side_effect=lambda func, data: [func(d) for d in data],
+)
+def test_save(
+    pool,
+    most_profit,
+    most_growth,
+    fewest_pe_e,
+    most_expensive,
+    save_to_file,
+    get_result,
+):
+    save()
+    calls = save_to_file.call_args_list
+    expect = [
+        call((most_expensive, [{"company": 1}])),
+        call((fewest_pe_e, [{"company": 1}])),
+        call((most_growth, [{"company": 1}])),
+        call((most_profit, [{"company": 1}])),
+    ]
+    assert calls == expect
 
 
 @patch("builtins.open")
 @patch("All_home_works.hw10.task1_save_result.json.dump")
-async def test_save_to_file(dump, open_mock):
+def test_save_to_file(dump, open_mock):
     data = []
     func = Mock(return_value="result")
     func.__name__ = "name"
-    save_to_file((data, func))
+    save_to_file(func, data)
     func.assert_called_once_with(data)
     dump.assert_called_once()
 

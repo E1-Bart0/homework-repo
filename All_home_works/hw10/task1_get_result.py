@@ -38,20 +38,45 @@ https://markets.businessinsider.com/index/components/s&p_500
 
 """
 import asyncio
-import concurrent.futures
-import time
+from multiprocessing import Pool
 
 import aiohttp
 from bs4 import BeautifulSoup
+
+URL = "https://markets.businessinsider.com/index/components/s&p_500"
+MAIN_URL = "https://markets.businessinsider.com/"
+COURSE = 1
 
 
 async def fetch_response(url):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
-            if response.status == 200:
-                return await response.text()
-            else:
-                raise ValueError(f"Response should be 200, got: {response.status}")
+            return await response.text()
+
+
+async def collect_html_for_companies(data):
+    company_url, annual_growth = data
+    company_url = MAIN_URL + company_url
+    return await fetch_response(company_url), annual_growth
+
+
+async def get_current_course():
+    def _parse_current_course(html):
+        soup = BeautifulSoup(html, features="html.parser")
+        course = soup.find("valute", id="R01235").find("value").string
+        return float(course.replace(",", "."))
+
+    url = "http://www.cbr.ru/scripts/XML_daily.asp"
+    response = await fetch_response(url)
+    return _parse_current_course(response)
+
+
+async def collect_data():
+    global COURSE
+    response, COURSE = await asyncio.gather(fetch_response(URL), get_current_course())
+    return await asyncio.gather(
+        *map(collect_html_for_companies, get_company_url_from_main_table(response))
+    )
 
 
 def get_company_url_from_main_table(response):
@@ -61,86 +86,53 @@ def get_company_url_from_main_table(response):
             a_tag = row.find("a")
             annual_growth_tag = list(row.find_all("span"))[-1]
             company_url = a_tag["href"]
-            annual_growth = annual_growth_tag.string
+            annual_growth = get_float(annual_growth_tag.string)
             yield company_url, annual_growth
 
 
-async def get_full_info_about_company(url, company_url, annual_growth, course):
-    main_url_list = url.split("/")[:3]
-    main_url = "/".join(main_url_list)
-    company_url = main_url + company_url
-    response = await fetch_response(company_url)
-    return await _get_additional_info_about_company(response, annual_growth, course)
+def get_company_as_a_dict(html, annual_growth):
+    soup = BeautifulSoup(html, features="html.parser")
+    row = soup.find("div", class_="price-section__row")
 
-
-async def _get_additional_info_about_company(response, annual_growth, course):
-    soup = BeautifulSoup(response, features="html.parser")
-    row = soup.find("div", {"class": "price-section__row"})
     row = list(row.stripped_strings)
     company_name, company_code, current_value = row[0], row[2][2:], row[3]
-    pe_ratio, week_low, week_high = list(_find_values_for_company(soup))
-
-    if week_high is not None and week_low is not None:
-        profit = round((week_high / week_low - 1) * 100, 2)
-    else:
-        profit = None
-    current_value = float(current_value.replace(",", ""))
-    price = round(current_value * course, 2)
-
+    pe_ratio, profit = find_p_e_ratio_and_profit(soup)
+    current_value = get_float(current_value)
+    price = round(current_value * COURSE, 2)
     return {
         "code": company_code,
         "name": company_name,
         "price": price,
         "P/E": pe_ratio,
-        "growth": float(annual_growth[:-1]),
+        "growth": annual_growth,
         "potential profit": profit,
     }
 
 
-def _find_values_for_company(soup):
-    table = soup.find("div", {"class": "snapshot"})
-    for text in ("P/E Ratio", "52 Week Low", "52 Week High"):
-        tag = table.find("div", text=text)
+def find_p_e_ratio_and_profit(soup):
+    def get_values(soup, text):
+        tag = soup.find("div", text=text)
         if tag is None:
-            yield None
-        else:
-            value = list(tag.parent.stripped_strings)[0]
-            yield float(value.replace(",", ""))
+            return None
+        value = next(tag.parent.stripped_strings)
+        return get_float(value)
+
+    table = soup.find("div", {"class": "snapshot"})
+    p_e_ratio = get_values(table, "P/E Ratio")
+    week_low = get_values(table, "52 Week Low")
+    week_high = get_values(table, "52 Week High")
+    if week_low is None or week_high is None:
+        return p_e_ratio, None
+    profit = round((week_high / week_low - 1) * 100, 2)
+    return p_e_ratio, profit
 
 
-async def get_current_course():
-    now = time.strftime("%d/%m/%Y", time.localtime())
-    url = "http://www.cbr.ru/scripts/XML_daily.asp?date_req=" + now
-    response = await fetch_response(url)
-    return await _parse_current_course(response)
+def get_float(number: str):
+    number = number.rstrip("%")
+    return float(number.replace(",", ""))
 
 
-async def _parse_current_course(response):
-    soup = BeautifulSoup(response, features="html.parser")
-    course = soup.find("valute", {"id": "R01235"}).find("value").string
-    return float(course.replace(",", "."))
-
-
-async def _get_result_from(url, response, course):
-    features, results = [], []
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        for company_url, annual_growth in get_company_url_from_main_table(response):
-            features.append(
-                executor.submit(
-                    asyncio.run,
-                    get_full_info_about_company(
-                        url, company_url, annual_growth, course
-                    ),
-                )
-            )
-        for features in concurrent.futures.as_completed(features):
-            results.append(features.result())
-    return results
-
-
-async def get_result():
-    url = "https://markets.businessinsider.com/index/components/s&p_500"
-    get_course_task = asyncio.create_task(get_current_course())
-    response = await fetch_response(url)
-    course = await get_course_task
-    return await _get_result_from(url, response, course)
+def get_result():
+    data = asyncio.run(collect_data())
+    with Pool() as pool:
+        return pool.starmap(get_company_as_a_dict, data)

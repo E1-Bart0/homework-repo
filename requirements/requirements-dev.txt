@@ -1,0 +1,8 @@
+-r common.txt
+
+flake8==3.9.0
+flake8-bandit==2.1.2
+flake8-bugbear==21.4.3
+pre-commit==2.12.0
+pytest-cov>=2.10.1
+isort==5.8.0
