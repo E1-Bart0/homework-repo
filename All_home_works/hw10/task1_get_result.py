@@ -45,6 +45,7 @@ from bs4 import BeautifulSoup
 
 URL = "https://markets.businessinsider.com/index/components/s&p_500"
 MAIN_URL = "https://markets.businessinsider.com/"
+COURSE_URL = "https://www.cbr.ru/scripts/XML_daily.asp"
 COURSE = 1
 
 
@@ -62,12 +63,13 @@ async def collect_html_for_companies(data):
 
 async def get_current_course():
     def _parse_current_course(html):
-        soup = BeautifulSoup(html, features="html.parser")
-        course = soup.find("valute", id="R01235").find("value").string
+        soup = BeautifulSoup(html, features="lxml")
+        course = soup.find("valute", id="R01235").value.get_text(
+            strip=True, separator=""
+        )
         return float(course.replace(",", "."))
 
-    url = "http://www.cbr.ru/scripts/XML_daily.asp"
-    response = await fetch_response(url)
+    response = await fetch_response(COURSE_URL)
     return _parse_current_course(response)
 
 
@@ -81,11 +83,11 @@ async def collect_data():
 
 def get_company_url_from_main_table(response):
     soup = BeautifulSoup(response, features="html.parser")
-    for index, row in enumerate(soup.find_all("tr")):
-        if index > 1:
-            a_tag = row.find("a")
-            annual_growth_tag = list(row.find_all("span"))[-1]
+    for row in soup.find_all("tr"):
+        a_tag = row.find("a")
+        if hasattr(a_tag, "href"):
             company_url = a_tag["href"]
+            annual_growth_tag = next(reversed(row.find_all("span")))
             annual_growth = get_float(annual_growth_tag.string)
             yield company_url, annual_growth
 

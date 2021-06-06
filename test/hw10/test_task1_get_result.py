@@ -56,13 +56,11 @@ async def test_fetch_response__bad_url(get):
 
 @pytest.mark.asyncio()
 @patch(
-    "All_home_works.hw10.task1_get_result.aiohttp.ClientSession.get",
-    return_value=MockResponse(
-        status=200, text='<Valute ID="R01235"><Value>74,1373</Value>=</Valute>'
-    ),
+    "All_home_works.hw10.task1_get_result.fetch_response",
+    return_value='<Valute ID="R01235"><Value>74,1373</Value></Valute>',
 )
 async def test_get_current_course__parse_current_course(get):
-    url = "http://www.cbr.ru/scripts/XML_daily.asp"
+    url = "https://www.cbr.ru/scripts/XML_daily.asp"
     result = await get_current_course()
     get.assert_called_once_with(url)
     assert result == 74.1373
@@ -189,6 +187,7 @@ def test_get_company_url_from_main_table():
         "<tr></tr>"
         "<tr>"
         '<td><a href="/company/test"></a></td>'
+        "<td><span>2%</span></td>"
         "<td><span>1%</span></td>"
         "</tr>"
     )
