@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-from All_home_works.hw12.core import Base
+from All_home_works.hw12.core.db import Base
 
 
 class Human(Base):
