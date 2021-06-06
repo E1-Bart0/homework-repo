@@ -5,9 +5,7 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 sys.path = ["", "../.."] + sys.path[1:]
-from All_home_works.hw12.core.db import Base  # noqa: E402
-
-URL = "sqlite:///main.db"
+from All_home_works.hw12.core import URL, Base  # noqa: E402
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -19,14 +17,12 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
+# my_important_option = config.get_main_option("my_important_option")  # noqa: E800
 # ... etc.
 
 
@@ -42,7 +38,6 @@ def run_migrations_offline():
     script output.
 
     """
-    # url = config.get_main_option("sqlalchemy.url")
     url = config.get_main_option(URL)
     context.configure(
         url=url,
