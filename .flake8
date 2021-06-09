@@ -15,5 +15,8 @@ per-file-ignores =
     test*.py: D10, D101, D103, S101, ANN
     # Skip unused imports in __init__ files
     __init__.py: F401
+    base.py: F401
+    # Skip id in class database
+    task_models.py: A003
 
 doctests = True
