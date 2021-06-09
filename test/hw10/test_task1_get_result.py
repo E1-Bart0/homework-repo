@@ -5,15 +5,9 @@ from aiohttp import InvalidURL
 from bs4 import BeautifulSoup
 
 from All_home_works.hw10.task1_get_result import (
-    collect_data,
-    collect_html_for_companies,
+    CollectDataAboutCompany,
     fetch_response,
-    find_p_e_ratio_and_profit,
-    get_company_as_a_dict,
-    get_company_url_from_main_table,
     get_current_course,
-    get_float,
-    get_result,
 )
 
 
@@ -67,41 +61,44 @@ async def test_get_current_course__parse_current_course(get):
 
 
 @pytest.mark.asyncio()
-@patch("All_home_works.hw10.task1_get_result.URL", "url")
-@patch("All_home_works.hw10.task1_get_result.COURSE", 1)
+@patch("All_home_works.hw10.task1_get_result.CollectDataAboutCompany.URL", "url")
 @patch("All_home_works.hw10.task1_get_result.fetch_response", return_value="response")
 @patch("All_home_works.hw10.task1_get_result.get_current_course", return_value=2.0)
 @patch(
-    "All_home_works.hw10.task1_get_result.collect_html_for_companies",
+    "All_home_works.hw10.task1_get_result.CollectDataAboutCompany.collect_html_for_company",
     return_value="html",
 )
 @patch(
-    "All_home_works.hw10.task1_get_result.get_company_url_from_main_table",
-    return_value=iter([("/company/1", 10.0), ("company/2", -10.0)]),
+    "All_home_works.hw10.task1_get_result.CollectDataAboutCompany.parse_company_url_annual_growth_from_main_table",
+    return_value=iter(
+        [("/company_page_content/1", 10.0), ("/company_page_content/2", -10.0)]
+    ),
 )
-async def test_collect_data(get_companies_url, collect_html, get_course, get_response):
-    result = await collect_data()
+async def test_collect_companies_html_annual_growth(
+    parse_companies_url, collect_html, get_course, get_response
+):
+    collector = CollectDataAboutCompany()
+    result = await collector.collect_companies_html_annual_growth()
     get_response.assert_called_once_with("url")
     get_course.assert_called_once()
-    get_companies_url.assert_called_once_with(get_response.return_value)
+    parse_companies_url.assert_called_once_with(get_response.return_value)
     calls = collect_html.call_args_list
-    assert [call(("/company/1", 10.0)), call(("company/2", -10.0))] == calls
-    assert result == ["html", "html"]
+    assert calls == [call("/company_page_content/1"), call("/company_page_content/2")]
+    assert list(result) == [("html", 10.0), ("html", -10.0)]
+    assert collector.course == 2.0
 
 
 @pytest.mark.asyncio()
 @patch("All_home_works.hw10.task1_get_result.fetch_response", return_value="text")
-@patch("All_home_works.hw10.task1_get_result.MAIN_URL", "url/")
-async def test_collect_html_for_companies(get_response):
-    data = ("company/1", 10.0)
-    result = await collect_html_for_companies(data)
+@patch("All_home_works.hw10.task1_get_result.CollectDataAboutCompany.MAIN_URL", "url/")
+async def test_collect_html_for_company(get_response):
+    result = await CollectDataAboutCompany().collect_html_for_company("company/1")
     get_response.assert_called_once_with("url/company/1")
-    assert result == ("text", 10.0)
+    assert result == "text"
 
 
-@patch("All_home_works.hw10.task1_get_result.COURSE", 1)
 @patch(
-    "All_home_works.hw10.task1_get_result.find_p_e_ratio_and_profit",
+    "All_home_works.hw10.task1_get_result.CollectDataAboutCompany.find_p_e_ratio_and_profit",
     return_value=[1.11, 50.0],
 )
 def test_get_company_as_a_dict(
@@ -114,8 +111,10 @@ def test_get_company_as_a_dict(
         "<span>203.20</span>"
         "</div>"
     )
+    collector = CollectDataAboutCompany()
+    collector.course = 1
     annual_growth = -10.0
-    result = get_company_as_a_dict(request, annual_growth)
+    result = collector.get_company_as_a_dict(request, annual_growth)
     expected = {
         "code": "MMM",
         "name": "3M Co.",
@@ -142,9 +141,9 @@ def test_find_p_e_ratio_and_profit_is_ok():
     )
     soup = BeautifulSoup(request, features="html.parser")
     profit = 100.0
-    result = find_p_e_ratio_and_profit(soup)
-    expected = (19.9, profit)
-    assert expected == result
+    result = CollectDataAboutCompany().find_p_e_ratio_and_profit(soup)
+    expected = 19.9, profit
+    assert result == expected
 
 
 def test_find_p_e_ratio_and_profit__if_coma_in_value():
@@ -160,25 +159,25 @@ def test_find_p_e_ratio_and_profit__if_coma_in_value():
         "</div>"
     )
     soup = BeautifulSoup(request, features="html.parser")
-    result = find_p_e_ratio_and_profit(soup)
-    assert (1900.1, 100) == result
+    result = CollectDataAboutCompany().find_p_e_ratio_and_profit(soup)
+    assert result == (1900.1, 100.0)
 
 
 def test_find_p_e_ratio_and_profit__if_week_low_and_week_high_is_none():
     request = '<div class="snapshot">' "<div>10.0<div>P/E Ratio</div>" "</div>" "</div>"
     soup = BeautifulSoup(request, features="html.parser")
-    result = find_p_e_ratio_and_profit(soup)
-    assert (10.0, None) == result
+    result = CollectDataAboutCompany().find_p_e_ratio_and_profit(soup)
+    assert result == (10.0, None)
 
 
 def test_find_p_e_ratio_and_profit__if_all_is_none():
     request = '<div class="snapshot">' "</div>"
     soup = BeautifulSoup(request, features="html.parser")
-    result = find_p_e_ratio_and_profit(soup)
-    assert (None, None) == result
+    result = CollectDataAboutCompany().find_p_e_ratio_and_profit(soup)
+    assert result == (None, None)
 
 
-def test_get_company_url_from_main_table():
+def test_parse_company_url_annual_growth_from_main_table():
     response = (
         "<tr>"
         "<td><h1>NAME</h1></td>"
@@ -191,37 +190,26 @@ def test_get_company_url_from_main_table():
         "<td><span>1%</span></td>"
         "</tr>"
     )
-    result = get_company_url_from_main_table(response)
-    assert [("/company/test", 1.0)] == list(result)
-
-
-@pytest.mark.parametrize(
-    ("string", "expect"),
-    [
-        ("-11%", -11.0),
-        ("10.0%", 10.0),
-        ("1,000.00", 1000.0),
-        ("-1,000.00", -1000.0),
-    ],
-)
-def test_get_float(string, expect):
-    assert expect == get_float(string)
+    result = CollectDataAboutCompany().parse_company_url_annual_growth_from_main_table(
+        response
+    )
+    assert list(result) == [("/company/test", 1.0)]
 
 
 @patch(
-    "All_home_works.hw10.task1_get_result.collect_data",
+    "All_home_works.hw10.task1_get_result.CollectDataAboutCompany.collect_companies_html_annual_growth",
     return_value=[("html1", 1.0), ("html2", 2.0)],
 )
 @patch(
-    "All_home_works.hw10.task1_get_result.get_company_as_a_dict",
+    "All_home_works.hw10.task1_get_result.CollectDataAboutCompany.get_company_as_a_dict",
     return_value={"company": "ok"},
 )
 @patch(
     "multiprocessing.pool.Pool.starmap",
     side_effect=lambda func, data: [func(d) for d in data],
 )
-def test_get_result_is_ok(pool, get_dict, collect):
-    result = get_result()
+def test_run_is_ok(pool, get_dict, collect):
+    result = CollectDataAboutCompany().run()
     collect.assert_called_once()
     assert get_dict.call_args_list == [call(("html1", 1.0)), call(("html2", 2.0))]
     assert result == [{"company": "ok"}, {"company": "ok"}]
