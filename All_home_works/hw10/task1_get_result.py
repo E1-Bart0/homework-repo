@@ -110,9 +110,9 @@ def get_company_as_a_dict(company_html, annual_growth, course):
     row = soup.find("div", class_="price-section__row")
 
     row = list(row.stripped_strings)
-    company_name, company_code, current_value = row[0], row[2][2:], row[3]
+    company_name, company_code, str_current_value = row[0], row[2][2:], row[3]
     pe_ratio, profit = find_p_e_ratio_and_profit(soup)
-    current_value = parse_float(current_value)
+    current_value = parse_float(str_current_value)
     price = round(current_value * course, 2)
     return {
         "code": company_code,
@@ -142,7 +142,7 @@ def find_p_e_ratio_and_profit(soup):
     return p_e_ratio, profit
 
 
-def parse_float(number: str):
+def parse_float(str_number: str):
     """
     >>> parse_float('-11%')
     -11.0
@@ -153,8 +153,8 @@ def parse_float(number: str):
     >>> parse_float('-1,000.00%')
     -1000.0
     """
-    number = number.rstrip("%")
-    return float(number.replace(",", ""))
+    str_number = str_number.rstrip("%")
+    return float(str_number.replace(",", ""))
 
 
 def parse_html_to_get_companies_data():

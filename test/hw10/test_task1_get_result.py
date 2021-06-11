@@ -66,7 +66,7 @@ async def test_get_current_course__parse_current_course(get):
 
 
 @pytest.mark.asyncio()
-@patch("All_home_works.hw10.task1_get_result.URL", "url")
+@patch("All_home_works.hw10.task1_get_result.URL_FOR_TABLE", "url")
 @patch("All_home_works.hw10.task1_get_result.fetch_response", return_value="response")
 @patch("All_home_works.hw10.task1_get_result.get_current_course", return_value=2.0)
 @patch(
