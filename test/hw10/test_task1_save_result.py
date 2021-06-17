@@ -14,7 +14,7 @@ from All_home_works.hw10.task1_save_result import (
 
 @pytest.mark.asyncio()
 @patch(
-    "All_home_works.hw10.task1_save_result.parse_html_to_get_companies_data",
+    "All_home_works.hw10.task1_save_result.get_data_about_companies",
     return_value=[{"company": 1}],
 )
 @patch("All_home_works.hw10.task1_save_result.save_to_file")

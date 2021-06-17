@@ -44,9 +44,6 @@ from multiprocessing import Pool
 import aiohttp
 from bs4 import BeautifulSoup
 
-MAIN_URL = "https://markets.businessinsider.com/"
-URL_FOR_TABLE = "https://markets.businessinsider.com/index/components/s&p_500"
-
 
 async def fetch_response(url):
     async with aiohttp.ClientSession() as session:
@@ -66,24 +63,19 @@ async def get_current_course():
     return _parse_current_course(xml_with_course_data)
 
 
-async def collect_html_for_company(company_url):
-    company_url = MAIN_URL + company_url
-    return await fetch_response(company_url)
-
-
-async def collect_html_annual_growth_for_companies__course():
+async def collect_html_annual_growth_for_companies__course(main_url, url_for_table):
     main_table_html, course = await asyncio.gather(
-        fetch_response(URL_FOR_TABLE), get_current_course()
+        fetch_response(url_for_table), get_current_course()
     )
     url_and_annual_growth_for_companies = (
-        parse_company_url_annual_growth_from_main_table(main_table_html)
+        parse_company_url_annual_growth_from_main_table(main_url, main_table_html)
     )
     url_for_companies, annual_growth_for_companies = map(
         list, zip(*url_and_annual_growth_for_companies)
     )
     html_for_companies = await asyncio.gather(
         *map(
-            collect_html_for_company,
+            fetch_response,
             url_for_companies,
         )
     )
@@ -94,12 +86,13 @@ async def collect_html_annual_growth_for_companies__course():
     )
 
 
-def parse_company_url_annual_growth_from_main_table(main_table_html):
+def parse_company_url_annual_growth_from_main_table(main_url, main_table_html):
     soup = BeautifulSoup(main_table_html, features="html.parser")
     for row in soup.find_all("tr"):
         a_tag = row.find("a")
         if hasattr(a_tag, "href"):
-            company_url = a_tag["href"]
+            suffix_company_url = a_tag["href"]
+            company_url = main_url + suffix_company_url
             annual_growth_tag = next(reversed(row.find_all("span")))
             annual_growth = parse_float(annual_growth_tag.string)
             yield company_url, annual_growth
@@ -157,9 +150,15 @@ def parse_float(str_number: str):
     return float(str_number.replace(",", ""))
 
 
-def parse_html_to_get_companies_data():
+def parse_html_to_get_companies_data(main_url, url_for_company):
     html_annual_growth_for_companies = asyncio.run(
-        collect_html_annual_growth_for_companies__course()
+        collect_html_annual_growth_for_companies__course(main_url, url_for_company)
     )
     with Pool() as pool:
         return pool.starmap(get_company_as_a_dict, html_annual_growth_for_companies)
+
+
+def main():
+    main_url = "https://markets.businessinsider.com/"
+    url_for_company = "https://markets.businessinsider.com/index/components/s&p_500"
+    return parse_html_to_get_companies_data(main_url, url_for_company)

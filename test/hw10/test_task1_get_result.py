@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup
 
 from All_home_works.hw10.task1_get_result import (
     collect_html_annual_growth_for_companies__course,
-    collect_html_for_company,
     fetch_response,
     find_p_e_ratio_and_profit,
     get_company_as_a_dict,
@@ -66,13 +65,11 @@ async def test_get_current_course__parse_current_course(get):
 
 
 @pytest.mark.asyncio()
-@patch("All_home_works.hw10.task1_get_result.URL_FOR_TABLE", "url")
-@patch("All_home_works.hw10.task1_get_result.fetch_response", return_value="response")
-@patch("All_home_works.hw10.task1_get_result.get_current_course", return_value=2.0)
 @patch(
-    "All_home_works.hw10.task1_get_result.collect_html_for_company",
-    return_value="html",
+    "All_home_works.hw10.task1_get_result.fetch_response",
+    side_effect=("main_table_response", "company_response1", "company_response2"),
 )
+@patch("All_home_works.hw10.task1_get_result.get_current_course", return_value=2.0)
 @patch(
     "All_home_works.hw10.task1_get_result.parse_company_url_annual_growth_from_main_table",
     return_value=iter(
@@ -80,24 +77,26 @@ async def test_get_current_course__parse_current_course(get):
     ),
 )
 async def test_collect_html_annual_growth_for_companies__course(
-    parse_companies_url, collect_html, get_course, get_response
+    parse_company, get_course, fetch
 ):
-    result = await collect_html_annual_growth_for_companies__course()
-    get_response.assert_called_once_with("url")
+    main_url = "main-url.com"
+    url_for_table = "main-url.com/table?page=1"
+
+    result = await collect_html_annual_growth_for_companies__course(
+        main_url, url_for_table
+    )
+    parse_company.assert_called_once_with("main-url.com", "main_table_response")
     get_course.assert_called_once()
-    parse_companies_url.assert_called_once_with(get_response.return_value)
-    calls = collect_html.call_args_list
-    assert calls == [call("/company_page_content/1"), call("/company_page_content/2")]
-    assert list(result) == [("html", 10.0, 2.0), ("html", -10.0, 2.0)]
-
-
-@pytest.mark.asyncio()
-@patch("All_home_works.hw10.task1_get_result.fetch_response", return_value="text")
-@patch("All_home_works.hw10.task1_get_result.MAIN_URL", "url/")
-async def test_collect_html_for_company(get_response):
-    result = await collect_html_for_company("company/1")
-    get_response.assert_called_once_with("url/company/1")
-    assert result == "text"
+    calls = fetch.call_args_list
+    assert calls == [
+        call("main-url.com/table?page=1"),
+        call("/company_page_content/1"),
+        call("/company_page_content/2"),
+    ]
+    assert list(result) == [
+        ("company_response1", 10.0, 2.0),
+        ("company_response2", -10.0, 2.0),
+    ]
 
 
 @patch(
@@ -192,8 +191,9 @@ def test_parse_company_url_annual_growth_from_main_table():
         "<td><span>1%</span></td>"
         "</tr>"
     )
-    result = parse_company_url_annual_growth_from_main_table(response)
-    assert list(result) == [("/company/test", 1.0)]
+    main_url = "main-url.com"
+    result = parse_company_url_annual_growth_from_main_table(main_url, response)
+    assert list(result) == [("main-url.com/company/test", 1.0)]
 
 
 @patch(
@@ -209,7 +209,8 @@ def test_parse_company_url_annual_growth_from_main_table():
     side_effect=lambda func, data: [func(d) for d in data],
 )
 def test_run_is_ok(pool, get_dict, collect):
-    result = parse_html_to_get_companies_data()
+    main_url, url_for_company = "main-url.com", "/company_page_content/1"
+    result = parse_html_to_get_companies_data(main_url, url_for_company)
     collect.assert_called_once()
     assert get_dict.call_args_list == [
         call(("html1", 2.0, 1.0)),

@@ -4,7 +4,7 @@ from itertools import repeat
 from multiprocessing import Pool
 from operator import itemgetter
 
-from All_home_works.hw10.task1_get_result import parse_html_to_get_companies_data
+from All_home_works.hw10.task1_get_result import main as get_data_about_companies
 
 
 def top_most_expensive_companies(data, limit):
@@ -43,7 +43,7 @@ def save_to_file(func, data, limit):
 
 
 def save():
-    data_about_companies = parse_html_to_get_companies_data()
+    data_about_companies = get_data_about_companies()
     functions = (
         top_most_expensive_companies,
         top_fewest_pe_rating_companies,
@@ -55,7 +55,3 @@ def save():
         pool.starmap(
             save_to_file, zip(functions, repeat(data_about_companies), repeat(limit))
         )
-
-
-if __name__ == "__main__":
-    save()
