@@ -1,4 +1,11 @@
-numpy==1.20.2
+aiohttp==3.7.4.post0
+beautifulsoup4==4.9.3
+lxml==4.6.3
 
+pytest>=6.2.3
+pytest-asyncio==0.15.1
+
+
+numpy==1.20.3
 SQLAlchemy==1.4.15
 alembic==1.6.5
